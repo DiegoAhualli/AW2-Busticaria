@@ -1,0 +1,52 @@
+[
+  {
+    "id": 1,
+    "id_usuario": 1,
+    "fecha": "2026-08-22",
+    "total": 900000,
+    "direccion": "Av. Colon 1500, Cordoba",
+    "pagada": true,
+    "productos": [
+      {
+        "id_producto": 1,
+        "cantidad": 1
+      },
+      {
+        "id_producto": 2,
+        "cantidad": 1
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "id_usuario": 2,
+    "fecha": "2026-08-24",
+    "total": 56000,
+    "direccion": "Obispo Trejo 850, Cordoba",
+    "pagada": true,
+    "productos": [
+      {
+        "id_producto": 3,
+        "cantidad": 2
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "id_usuario": 4,
+    "fecha": "2026-08-27",
+    "total": 97000,
+    "direccion": "Buenos Aires 620, Cordoba",
+    "pagada": false,
+    "productos": [
+      {
+        "id_producto": 4,
+        "cantidad": 1
+      },
+      {
+        "id_producto": 5,
+        "cantidad": 1
+      }
+    ]
+  }
+]

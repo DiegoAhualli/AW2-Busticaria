@@ -1,0 +1,52 @@
+[
+  {
+    "id": 1,
+    "nombre": "Notebook Gamer",
+    "descripcion": "Notebook para gaming y uso profesional",
+    "categoria": "tecnologia",
+    "precio": 850000,
+    "stock": 5,
+    "imagen": "notebook.jpg",
+    "disponible": true
+  },
+  {
+    "id": 2,
+    "nombre": "Auriculares Bluetooth",
+    "descripcion": "Auriculares inalambricos con microfono",
+    "categoria": "tecnologia",
+    "precio": 45000,
+    "stock": 12,
+    "imagen": "auriculares.jpg",
+    "disponible": true
+  },
+  {
+    "id": 3,
+    "nombre": "Remera Oversize",
+    "descripcion": "Remera de algodon corte oversize",
+    "categoria": "ropa",
+    "precio": 28000,
+    "stock": 20,
+    "imagen": "remera.jpg",
+    "disponible": true
+  },
+  {
+    "id": 4,
+    "nombre": "Lampara de Mesa",
+    "descripcion": "Lampara decorativa para dormitorio o escritorio",
+    "categoria": "hogar",
+    "precio": 32000,
+    "stock": 0,
+    "imagen": "lampara.jpg",
+    "disponible": false
+  },
+  {
+    "id": 5,
+    "nombre": "Teclado Mecanico",
+    "descripcion": "Teclado mecanico retroiluminado",
+    "categoria": "tecnologia",
+    "precio": 65000,
+    "stock": 8,
+    "imagen": "teclado.jpg",
+    "disponible": true
+  }
+]

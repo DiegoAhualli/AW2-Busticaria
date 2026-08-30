@@ -1,0 +1,34 @@
+[
+  {
+    "id": 1,
+    "nombre": "Juan",
+    "apellido": "Perez",
+    "email": "juan.perez@gmail.com",
+    "password": "juan123",
+    "activo": true
+  },
+  {
+    "id": 2,
+    "nombre": "Sofia",
+    "apellido": "Martinez",
+    "email": "sofia.martinez@gmail.com",
+    "password": "sofia456",
+    "activo": true
+  },
+  {
+    "id": 3,
+    "nombre": "Diego",
+    "apellido": "Ahualli",
+    "email": "diego.ahualli@gmail.com",
+    "password": "diego123",
+    "activo": false
+  },
+  {
+    "id": 4,
+    "nombre": "Mia",
+    "apellido": "Mollea",
+    "email": "mia.mollea@gmail.com",
+    "password": "mia123",
+    "activo": true
+  }
+]
