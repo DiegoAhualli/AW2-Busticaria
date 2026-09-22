@@ -58,5 +58,15 @@
     "stock": 10,
     "imagen": "mouse.jpg",
     "disponible": true
+  },
+  {
+    "id": 7,
+    "nombre": "Mouse Gamer",
+    "descripcion": "Mouse RGB con 6 botones",
+    "categoria": "tecnologia",
+    "precio": 25000,
+    "stock": 10,
+    "imagen": "mouse.jpg",
+    "disponible": true
   }
 ]
