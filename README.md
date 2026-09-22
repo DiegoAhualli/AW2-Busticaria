@@ -54,7 +54,7 @@ Ejemplo de estructura:
   "password": "juan123",
   "activo": true
 }
-
+```
 
 
 ---
