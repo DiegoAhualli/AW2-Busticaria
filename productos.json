@@ -35,9 +35,9 @@
     "descripcion": "Lampara decorativa para dormitorio o escritorio",
     "categoria": "hogar",
     "precio": 32000,
-    "stock": 0,
+    "stock": 5,
     "imagen": "lampara.jpg",
-    "disponible": false
+    "disponible": true
   },
   {
     "id": 5,
@@ -47,6 +47,16 @@
     "precio": 65000,
     "stock": 8,
     "imagen": "teclado.jpg",
+    "disponible": true
+  },
+  {
+    "id": 6,
+    "nombre": "Mouse Gamer",
+    "descripcion": "Mouse RGB con 6 botones",
+    "categoria": "tecnologia",
+    "precio": 25000,
+    "stock": 10,
+    "imagen": "mouse.jpg",
     "disponible": true
   }
 ]
