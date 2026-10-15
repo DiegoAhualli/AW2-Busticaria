@@ -8,15 +8,15 @@ Diego Ahualli
 
 # Descripción
 
-Busticaria es una aplicación web de ecommerce desarrollada originalmente como trabajo integrador para la materia Aplicaciones Web I del colegio universitario IES 21.
+Busticaria es una aplicación web de ecommerce desarrollada originalmente como trabajo integrador para la materia Aplicaciones Web I del Colegio Universitario IES 21.
 
 Durante Aplicaciones Web I se desarrolló el Front-End de la aplicación, incorporando navegación, autenticación simulada, categorías de productos, carrito de compras, consumo de una API externa y persistencia de información mediante Web Storage.
 
-Este repositorio corresponde a la continuación del proyecto para la materia Aplicaciones Web II, donde se comenzará a trabajar sobre el desarrollo del Back-End de la aplicación.
+Este repositorio corresponde a la continuación del proyecto para la materia Aplicaciones Web II, donde se desarrolla el Back-End de la aplicación utilizando Node.js y Express.js.
 
 ---
 
-# Primera Entrega
+# Primera entrega - Estructuras JSON
 
 Como primera etapa de Aplicaciones Web II se crearon estructuras de datos en formato JSON que representan información relacionada con el funcionamiento del ecommerce.
 
@@ -27,8 +27,6 @@ Se utilizaron tres archivos:
 - `ventas.json`
 
 Los datos se encuentran relacionados entre sí mediante identificadores.
-
----
 
 ## usuarios.json
 
@@ -56,17 +54,13 @@ Ejemplo de estructura:
 }
 ```
 
-
 ---
 
 # Segunda entrega - API REST con Express.js
 
 En esta etapa se desarrolló un servidor utilizando Node.js y Express.js para gestionar los datos de Busticaria mediante solicitudes HTTP.
 
-La aplicación utiliza tres archivos JSON:
-- usuarios.json
-- productos.json
-- ventas.json
+El servidor permite consultar, registrar, modificar y eliminar información almacenada en los archivos JSON.
 
 ## Tecnologías utilizadas
 
@@ -75,6 +69,35 @@ La aplicación utiliza tres archivos JSON:
 - Express.js
 - JSON
 - Postman
+
+## Estructura del proyecto
+
+El proyecto se organizó separando los archivos de datos, las rutas y la configuración del servidor para facilitar su lectura, mantenimiento y futuras ampliaciones.
+
+```text
+AW2-Busticaria/
+├── data/
+│   ├── archivos.mjs
+│   ├── productos.json
+│   ├── usuarios.json
+│   └── ventas.json
+├── routes/
+│   ├── productos.mjs
+│   ├── usuarios.mjs
+│   └── ventas.mjs
+├── .gitignore
+├── package.json
+├── package-lock.json
+├── README.md
+└── server.mjs
+```
+
+**Organización:**
+
+- `data/`: almacena los archivos JSON y las funciones para leer y guardar información.
+- `routes/`: contiene los endpoints organizados según el recurso que administran: productos, usuarios y ventas.
+- `server.mjs`: configura Express, incorpora las rutas e inicia el servidor.
+- `package.json`: contiene la información del proyecto y sus dependencias.
 
 ## Instalación y ejecución
 
@@ -85,38 +108,40 @@ La aplicación utiliza tres archivos JSON:
 
 El servidor se ejecuta en:
 
-http://localhost:3000
+`http://localhost:3000`
 
 ## Rutas implementadas
 
 | Método | Ruta | Descripción |
 |---|---|---|
-| GET | / | Bienvenida a la API |
-| GET | /api/productos | Consultar todos los productos |
-| GET | /api/ventas | Consultar todas las ventas |
-| POST | /api/usuarios | Registrar un nuevo usuario |
-| POST | /api/productos | Registrar un nuevo producto |
-| PUT | /api/productos/:id | Actualizar el stock de un producto |
-| DELETE | /api/usuarios/:id | Eliminar un usuario sin ventas relacionadas |
+| GET | `/` | Bienvenida a la API |
+| GET | `/api/productos` | Consultar todos los productos |
+| GET | `/api/ventas` | Consultar todas las ventas |
+| POST | `/api/usuarios` | Registrar un nuevo usuario |
+| POST | `/api/productos` | Registrar un nuevo producto |
+| PUT | `/api/productos/:id` | Actualizar el stock de un producto |
+| DELETE | `/api/usuarios/:id` | Eliminar un usuario sin ventas relacionadas |
 
 ## Funcionamiento
 
 Las solicitudes GET permiten consultar los datos almacenados en los archivos JSON.
 
-Las solicitudes POST permiten agregar nuevos usuarios y productos.
+Las solicitudes POST permiten agregar nuevos usuarios y productos, validando los datos recibidos.
 
 La solicitud PUT permite modificar el stock de un producto existente y actualizar su disponibilidad.
 
 La solicitud DELETE permite eliminar un usuario, siempre que no tenga ventas registradas. De esta manera, se mantiene la integridad de los datos.
 
-Los endpoints devuelven códigos de estado HTTP según el resultado de cada solicitud.
+Las operaciones de lectura y escritura se realizan mediante el módulo `fs/promises` de Node.js.
+
+Los endpoints devuelven códigos de estado HTTP según el resultado de cada solicitud, contemplando respuestas satisfactorias, errores de validación, recursos inexistentes y errores internos del servidor.
 
 ## Pruebas
 
-Las rutas fueron probadas utilizando Postman.
+Todas las rutas fueron probadas utilizando Postman, verificando el funcionamiento de las solicitudes GET, POST, PUT y DELETE.
 
-## Autor
+También se comprobó que los cambios realizados mediante las solicitudes se guardan correctamente en los archivos JSON correspondientes.
 
-Diego Ahualli
+---
 
-Aplicaciones Web II - IES Siglo 21
+**Aplicaciones Web II - IES Siglo 21**

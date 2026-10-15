@@ -68,5 +68,15 @@
     "stock": 10,
     "imagen": "mouse.jpg",
     "disponible": true
+  },
+  {
+    "id": 8,
+    "nombre": "Producto de prueba",
+    "descripcion": "Producto para verificar las rutas",
+    "categoria": "hogar",
+    "precio": 15000,
+    "stock": 5,
+    "imagen": "prueba.jpg",
+    "disponible": true
   }
 ]
