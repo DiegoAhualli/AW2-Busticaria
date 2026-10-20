@@ -30,5 +30,21 @@
     "email": "mia.mollea@gmail.com",
     "password": "mia123",
     "activo": true
+  },
+  {
+    "id": 5,
+    "nombre": "Diego",
+    "apellido": "Ahualli",
+    "email": "diegoahualli@gmail.com",
+    "password": "AEIOU1234",
+    "activo": true
+  },
+  {
+    "id": 6,
+    "nombre": "Diego",
+    "apellido": "Ahualli",
+    "email": "aa@mail.com",
+    "password": "12345678",
+    "activo": true
   }
 ]

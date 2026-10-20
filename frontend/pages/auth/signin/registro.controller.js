@@ -1,30 +1,39 @@
-console.log("Registro controller cargado");
+(function () {
+    const formRegistro = document.getElementById('formRegistro');
 
-const formRegistro = document.getElementById("formRegistro");
+    formRegistro.addEventListener('submit', async function (evento) {
+        evento.preventDefault();
 
-formRegistro.addEventListener("submit", function(evento){
+        const nombre = document.getElementById('txtnombre').value.trim();
+        const apellido = document.getElementById('txtapellido').value.trim();
+        const email = document.getElementById('txtemail').value.trim();
+        const password = document.getElementById('txtpassword').value;
+        const boton = formRegistro.querySelector('button[type="submit"]');
 
-    evento.preventDefault();
+        boton.disabled = true;
 
-    console.log("Submit interceptado");
+        try {
+            const respuesta = await fetch('/api/usuarios', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nombre, apellido, email, password })
+            });
 
-    const nombre = document.getElementById("txtnombre").value;
-    const apellido = document.getElementById("txtapellido").value;
-    const email = document.getElementById("txtemail").value;
-    const password = document.getElementById("txtpassword").value;
-    const fechaNacimiento = document.getElementById("txtfechaNacimiento").value;
+            const datos = await respuesta.json();
 
-    const usuario = {
-        nombre: nombre,
-        apellido: apellido,
-        email: email,
-        password: password,
-        fechaNacimiento: fechaNacimiento
-    };
+            if (!respuesta.ok) {
+                alert(datos.mensaje || 'No se pudo registrar el usuario');
+                return;
+            }
 
-    localStorage.setItem("usuarioRegistrado", JSON.stringify(usuario));
-
-    alert("Usuario registrado correctamente");
-
-    window.location.href = "../login/login.html";
-});
+            localStorage.removeItem('usuarioRegistrado'); // Limpiar el registro viejo de AW1.
+            alert('Usuario registrado correctamente. Iniciá sesión para continuar.');
+            window.location.href = '/pages/auth/login/login.html';
+        } catch (error) {
+            console.error('Error de conexión:', error);
+            alert('No se pudo conectar con el servidor');
+        } finally {
+            boton.disabled = false;
+        }
+    });
+})();

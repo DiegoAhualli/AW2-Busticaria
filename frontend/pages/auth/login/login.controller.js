@@ -1,34 +1,38 @@
-const formLogin = document.getElementById("formLogin");
+(function () {
+    const formLogin = document.getElementById('formLogin');
 
-formLogin.addEventListener("submit", function(evento){
+    formLogin.addEventListener('submit', async function (evento) {
+        evento.preventDefault();
 
-    evento.preventDefault();
+        const email = document.getElementById('txtemail').value.trim();
+        const password = document.getElementById('txtpassword').value;
+        const boton = formLogin.querySelector('button[type="submit"]');
 
-    const email = document.getElementById("txtemail").value;
+        boton.disabled = true;
 
-    const password = document.getElementById("txtpassword").value;
+        try {
+            const respuesta = await fetch('/api/usuarios/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
 
-    const usuarioGuardado = JSON.parse(
-        localStorage.getItem("usuarioRegistrado")
-    );
+            const datos = await respuesta.json();
 
-    if(
-        usuarioGuardado &&
-        email === usuarioGuardado.email &&
-        password === usuarioGuardado.password
-    ){
+            if (!respuesta.ok) {
+                alert(datos.mensaje || 'No se pudo iniciar sesión');
+                return;
+            }
 
-        sessionStorage.setItem(
-            "usuarioLogueado",
-            JSON.stringify(usuarioGuardado)
-        );
-
-        window.location.href = "../../home.html";
-
-    } else {
-
-        alert("Email o contraseña incorrectos");
-
-    }
-
-});
+            // Guardamos los datos públicos del usuario, nunca su contraseña.
+            sessionStorage.setItem('usuarioLogueado', JSON.stringify(datos.usuario));
+            localStorage.removeItem('usuarioRegistrado'); // Limpiar datos viejos de AW1.
+            window.location.href = '/pages/home.html';
+        } catch (error) {
+            console.error('Error de conexión:', error);
+            alert('No se pudo conectar con el servidor');
+        } finally {
+            boton.disabled = false;
+        }
+    });
+})();
