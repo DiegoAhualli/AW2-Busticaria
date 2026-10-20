@@ -44,7 +44,7 @@
     "nombre": "Diego",
     "apellido": "Ahualli",
     "email": "aa@mail.com",
-    "password": "12345678",
+    "password": "scrypt:453f7e5c06c3339832905a8aa05fa4ed:118d3cf70dfe243ebcbbd7fd677c093401bf6799e58e8078a97c2ddf320df72f575726505624d6caaf73009b053d5784827f789f38d7171ea269c06daf78eab2",
     "activo": true
   }
 ]
