@@ -1,3 +1,8 @@
+
+// Listado de páginas que forman parte de Busticaria.
+// Dejamos el nombre y la dirección de cada sección
+// en un mismo arreglo para tenerlas organizadas.
+
 const paginas = [
     {
         titulo: "Home",

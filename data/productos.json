@@ -61,12 +61,12 @@
   },
   {
     "id": 7,
-    "nombre": "Mouse Gamer",
-    "descripcion": "Mouse RGB con 6 botones",
+    "nombre": "Webcam Full HD",
+    "descripcion": "Cámara web 1080p con micrófono integrado",
     "categoria": "tecnologia",
-    "precio": 25000,
+    "precio": 38000,
     "stock": 20,
-    "imagen": "mouse.jpg",
+    "imagen": "webcam.jpg",
     "disponible": true
   }
 ]

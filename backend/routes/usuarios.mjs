@@ -1,3 +1,8 @@
+/**
+ * Rutas de usuarios de Busticaria.
+ * Registro, inicio de sesión y eliminación de usuarios.
+ * Los usuarios se identifican con un ID, que después se relaciona con las ventas.
+ */
 import express from 'express';
 import { randomBytes, scrypt, timingSafeEqual } from 'node:crypto';
 import { promisify } from 'node:util';
@@ -9,21 +14,25 @@ const scryptAsync = promisify(scrypt);
 const archivoUsuarios = fileURLToPath(new URL('../../data/usuarios.json', import.meta.url));
 const archivoVentas = fileURLToPath(new URL('../../data/ventas.json', import.meta.url));
 
-// Transformar una contraseña en un hash con sal (sin instalar librerías).
+// Convertimos la contraseña en un hash con una sal aleatoria.
+// Así las cuentas nuevas no guardan la contraseña directamente en el JSON.
 async function generarHash(password) {
     const sal = randomBytes(16).toString('hex');
     const clave = await scryptAsync(password, sal, 64);
     return `scrypt:${sal}:${clave.toString('hex')}`;
 }
 
+// Comprueba la contraseña recibida contra la que está guardada.
 async function verificarPassword(password, passwordGuardada) {
     if (typeof passwordGuardada !== 'string') return false;
 
-    // Compatibilidad temporal con los usuarios de ejemplo del TP1.
+    // Esto mantiene la compatibilidad con las cuentas de ejemplo del TP1.
+    // Es una solución temporal: esas contraseñas antiguas estaban en texto plano.
     if (!passwordGuardada.startsWith('scrypt:')) {
         return password === passwordGuardada;
     }
 
+    // El formato del campo es scrypt:sal:hash.
     const partes = passwordGuardada.split(':');
     if (partes.length !== 3) return false;
 
@@ -32,12 +41,14 @@ async function verificarPassword(password, passwordGuardada) {
         if (claveGuardada.length !== 64) return false;
 
         const claveIngresada = await scryptAsync(password, partes[1], 64);
+        // Comparamos los hashes sin utilizar una comparación común de strings.
         return timingSafeEqual(claveGuardada, claveIngresada);
     } catch (error) {
         return false;
     }
 }
 
+// Enviamos al navegador sólo los datos necesarios, nunca la contraseña.
 function datosPublicos(usuario) {
     return {
         id: usuario.id,
@@ -48,11 +59,12 @@ function datosPublicos(usuario) {
     };
 }
 
-// POST /api/usuarios/login - Validar credenciales en el backend.
+// POST /api/usuarios/login: valida email y contraseña desde Express.
 router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body ?? {};
 
+        // Evitamos buscar usuarios con datos vacíos o de otro tipo.
         if (typeof email !== 'string' || !email.trim() ||
             typeof password !== 'string' || !password) {
             return res.status(400).json({ mensaje: 'Ingresá email y contraseña' });
@@ -68,11 +80,12 @@ router.post('/login', async (req, res) => {
             return res.status(401).json({ mensaje: 'Email o contraseña incorrectos' });
         }
 
+        // Una cuenta inactiva no puede iniciar sesión.
         if (usuario.activo !== true) {
             return res.status(403).json({ mensaje: 'La cuenta se encuentra inactiva' });
         }
 
-        // Migrar automáticamente la contraseña antigua de prueba a un hash.
+        // Si ingresó con una contraseña vieja, la convertimos a hash.
         if (!usuario.password.startsWith('scrypt:')) {
             usuario.password = await generarHash(password);
             await guardarJSON(archivoUsuarios, usuarios);
@@ -88,11 +101,12 @@ router.post('/login', async (req, res) => {
     }
 });
 
-// POST /api/usuarios - Registrar una cuenta nueva.
+// POST /api/usuarios: registra una cuenta nueva en usuarios.json.
 router.post('/', async (req, res) => {
     try {
         const { nombre, apellido, email, password } = req.body ?? {};
 
+        // Se requiere un email válido y una contraseña de al menos ocho caracteres.
         if (typeof nombre !== 'string' || !nombre.trim() ||
             typeof apellido !== 'string' || !apellido.trim() ||
             typeof email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) ||
@@ -105,6 +119,7 @@ router.post('/', async (req, res) => {
         const usuarios = await leerJSON(archivoUsuarios);
         const emailNormalizado = email.trim().toLowerCase();
 
+        // No permitimos dos usuarios registrados con el mismo email.
         if (usuarios.some(u => u.email.toLowerCase() === emailNormalizado)) {
             return res.status(409).json({ mensaje: 'El email ya está registrado' });
         }
@@ -131,7 +146,7 @@ router.post('/', async (req, res) => {
     }
 });
 
-// DELETE /api/usuarios/:id - Mantener la integridad con las ventas del TP2.
+// DELETE /api/usuarios/:id: elimina únicamente usuarios sin ventas asociadas.
 router.delete('/:id', async (req, res) => {
     try {
         const id = Number(req.params.id);
@@ -147,6 +162,8 @@ router.delete('/:id', async (req, res) => {
             return res.status(404).json({ mensaje: 'Usuario no encontrado' });
         }
 
+        // Evitamos eliminar un usuario que figure en una compra previa.
+        // Así no dejamos ventas referenciando IDs que ya no existen.
         if (ventas.some(venta => venta.id_usuario === id)) {
             return res.status(409).json({
                 mensaje: 'No se puede eliminar el usuario porque tiene ventas registradas'
