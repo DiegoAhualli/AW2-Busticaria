@@ -1,156 +1,158 @@
 
-const contenedorTecnologia = document.getElementById("productosTecnologiaHome");
-const contenedorRopa = document.getElementById("productosRopaHome");
-const contenedorHogar = document.getElementById("productosHogarHome");
+const contenedorTecnologia = document.getElementById('productosTecnologiaHome');
+const contenedorRopa = document.getElementById('productosRopaHome');
+const contenedorHogar = document.getElementById('productosHogarHome');
+
+function leerCarrito() {
+    try {
+        const carrito = JSON.parse(localStorage.getItem('carrito'));
+        return Array.isArray(carrito) ? carrito : [];
+    } catch (error) {
+        return [];
+    }
+}
 
 async function cargarProductosHome() {
     try {
-        // Obtener productos desde servidor Express
-        const respuesta = await fetch("http://localhost:3000/productos");
+        // El frontend y la API se ejecutan en el mismo servidor Express.
+        const respuesta = await fetch('/api/productos');
 
         if (!respuesta.ok) {
-            throw new Error("Error al obtener los productos");
+            throw new Error(`Error HTTP ${respuesta.status} al consultar productos`);
         }
 
         const productos = await respuesta.json();
+        if (!Array.isArray(productos)) {
+            throw new Error('La API no devolvió una lista de productos');
+        }
+        if (!contenedorTecnologia || !contenedorRopa || !contenedorHogar) {
+            throw new Error('Faltan contenedores de productos en home.html');
+        }
 
-        // Filtrar productos disponibles por categoría
-        const productosTecnologia = productos.filter(function(producto) {
-            return producto.categoria === "tecnologia" && producto.disponible;
+        // Sólo mostrar productos a la venta (disponibles y con stock).
+        const disponibles = productos.filter(function(producto) {
+            return producto.disponible === true && producto.stock > 0;
         });
 
-        const productosRopa = productos.filter(function(producto) {
-            return producto.categoria === "ropa" && producto.disponible;
-        });
+        function mostrarProductos(categoria, contenedor) {
+            const lista = disponibles.filter(function(producto) {
+                return producto.categoria === categoria;
+            });
 
-        const productosHogar = productos.filter(function(producto) {
-            return producto.categoria === "hogar" && producto.disponible;
-        });
+            if (lista.length === 0) {
+                contenedor.innerHTML = '<p class="text-muted">No hay productos disponibles.</p>';
+                return;
+            }
 
-        // Limpiar los contenedores
-        contenedorTecnologia.innerHTML = "";
-        contenedorRopa.innerHTML = "";
-        contenedorHogar.innerHTML = "";
-
-        // Mostrar productos utilizando las cards
-        function mostrarProductos(lista, contenedor) {
-            lista.forEach(function(producto) {
-                contenedor.innerHTML += crearCardProducto({
+            contenedor.innerHTML = lista.map(function(producto) {
+                return crearCardProducto({
                     id: producto.id,
                     titulo: producto.nombre,
                     descripcion: producto.descripcion,
                     precio: producto.precio,
-                    imagen: "../assets/img/" + producto.imagen
+                    stock: producto.stock,
+                    imagen: '/assets/img/' + producto.imagen
                 });
-            });
+            }).join('');
         }
 
-        mostrarProductos(productosTecnologia, contenedorTecnologia);
-        mostrarProductos(productosRopa, contenedorRopa);
-        mostrarProductos(productosHogar, contenedorHogar);
+        mostrarProductos('tecnologia', contenedorTecnologia);
+        mostrarProductos('ropa', contenedorRopa);
+        mostrarProductos('hogar', contenedorHogar);
 
-        // Botones para aumentar cantidades
-        const botonesSumar = document.querySelectorAll(".btn-sumar");
+        // Función auxiliar para obtener el producto real a partir del ID.
+        function obtenerProductoDeBoton(boton) {
+            const articulo = boton.closest('article');
+            if (!articulo) return null;
+            const id = Number(articulo.dataset.id);
+            return disponibles.find(function(producto) {
+                return Number(producto.id) === id;
+            }) || null;
+        }
 
-        botonesSumar.forEach(function(boton) {
-            boton.addEventListener("click", function() {
-                const cantidad = boton.parentElement.querySelector(".cantidad");
-                cantidad.textContent = parseInt(cantidad.textContent) + 1;
-            });
-        });
+        // Botón +
+        document.querySelectorAll('.btn-sumar').forEach(function(boton) {
+            boton.addEventListener('click', function() {
+                const producto = obtenerProductoDeBoton(boton);
+                if (!producto) return;
 
-        // Botones para disminuir cantidades
-        const botonesRestar = document.querySelectorAll(".btn-restar");
+                const cantidad = boton.parentElement.querySelector('.cantidad');
+                const valor = Number(cantidad.textContent);
 
-        botonesRestar.forEach(function(boton) {
-            boton.addEventListener("click", function() {
-                const cantidad = boton.parentElement.querySelector(".cantidad");
-                const valorActual = parseInt(cantidad.textContent);
-
-                if (valorActual > 0) {
-                    cantidad.textContent = valorActual - 1;
+                if (valor >= producto.stock) {
+                    alert('No hay más stock disponible');
+                    return;
                 }
+
+                cantidad.textContent = valor + 1;
             });
         });
 
-        // Botones para agregar productos al carrito
-        const botonesCarrito = document.querySelectorAll(".btn-agregar-carrito");
+        // Botón -
+        document.querySelectorAll('.btn-restar').forEach(function(boton) {
+            boton.addEventListener('click', function() {
+                const cantidad = boton.parentElement.querySelector('.cantidad');
+                const valor = Number(cantidad.textContent);
+                if (valor > 0) cantidad.textContent = valor - 1;
+            });
+        });
 
-        botonesCarrito.forEach(function(boton) {
-            boton.addEventListener("click", function() {
-
-                const usuarioLogueado = sessionStorage.getItem("usuarioLogueado");
-
+        // Agregar productos al carrito
+        document.querySelectorAll('.btn-agregar-carrito').forEach(function(boton) {
+            boton.addEventListener('click', function() {
+                const usuarioLogueado = sessionStorage.getItem('usuarioLogueado');
                 if (!usuarioLogueado) {
-                    alert("Debes iniciar sesión para agregar productos al carrito");
-                    window.location.href = "auth/login/login.html";
+                    alert('Debes iniciar sesión para agregar productos al carrito');
+                    window.location.href = '/pages/auth/login/login.html';
                     return;
                 }
 
-                const cantidad = parseInt(
-                    boton.parentElement.querySelector(".cantidad").textContent
-                );
-
-                if (cantidad === 0) {
-                    alert("Seleccione una cantidad");
+                const producto = obtenerProductoDeBoton(boton);
+                if (!producto) {
+                    alert('No se encontró el producto');
                     return;
                 }
 
-                const card = boton.closest(".card");
-                const idProducto = Number(card.closest("article").dataset.id);
+                const articulo = boton.closest('article');
+                const cantidadElemento = articulo.querySelector('.cantidad');
+                const cantidad = Number(cantidadElemento.textContent);
+                if (!Number.isInteger(cantidad) || cantidad < 1) {
+                    alert('Seleccione una cantidad');
+                    return;
+                }
 
-                const productoOriginal = productos.find(function(producto) {
-                    return producto.id === idProducto;
+                const carrito = leerCarrito();
+                const existente = carrito.find(function(item) {
+                    return Number(item.id) === Number(producto.id);
                 });
+                const cantidadEnCarrito = existente ? Number(existente.cantidad) : 0;
 
-                if (!productoOriginal) {
-                    alert("No se encontró el producto");
+                if (cantidadEnCarrito + cantidad > producto.stock) {
+                    alert('La cantidad supera el stock disponible');
                     return;
                 }
 
-                // Comprobar stock disponible
-                if (cantidad > productoOriginal.stock) {
-                    alert("No hay suficiente stock disponible");
-                    return;
-                }
-
-                const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
-
-                const productoExistente = carrito.find(function(item) {
-                    return item.id === productoOriginal.id;
-                });
-
-                if (productoExistente) {
-                    if (parseInt(productoExistente.cantidad) + cantidad > productoOriginal.stock) {
-                        alert("La cantidad supera el stock disponible");
-                        return;
-                    }
-
-                    productoExistente.cantidad =
-                        parseInt(productoExistente.cantidad) + cantidad;
+                if (existente) {
+                    existente.cantidad = cantidadEnCarrito + cantidad;
                 } else {
                     carrito.push({
-                        id: productoOriginal.id,
-                        titulo: productoOriginal.nombre,
-                        precio: productoOriginal.precio,
+                        id: producto.id,
+                        titulo: producto.nombre,
+                        precio: producto.precio,
                         cantidad: cantidad,
-                        imagen: card.querySelector("img").src
+                        imagen: articulo.querySelector('img').src
                     });
                 }
 
-                localStorage.setItem("carrito", JSON.stringify(carrito));
-
-                boton.parentElement.querySelector(".cantidad").textContent = 0;
-
-                alert("Producto agregado al carrito");
+                localStorage.setItem('carrito', JSON.stringify(carrito));
+                cantidadElemento.textContent = '0';
+                alert('Producto agregado al carrito');
             });
         });
-
     } catch (error) {
-        console.error("Error al cargar los productos:", error);
-        alert("No se pudieron cargar los productos");
+        console.error('Error al cargar los productos:', error);
+        alert('No se pudieron cargar los productos. Revisá que Express esté encendido.');
     }
 }
 
-// Ejecutar cuando se carga la página
 cargarProductosHome();

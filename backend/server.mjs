@@ -1,30 +1,39 @@
 
 import express from 'express';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-import productosRoutes from './routes/productos.mjs';
-import usuariosRoutes from './routes/usuarios.mjs';
-import ventasRoutes from './routes/ventas.mjs';
+import productosRouter from './routes/productos.mjs';
+import usuariosRouter from './routes/usuarios.mjs';
+import ventasRouter from './routes/ventas.mjs';
 
-// Crear el servidor
 const app = express();
 const PORT = 3000;
 
-// Permitir recibir datos JSON
+// Directorio donde está el frontend de Busticaria
+const directorioBackend = path.dirname(fileURLToPath(import.meta.url));
+const directorioFrontend = path.resolve(directorioBackend, '../frontend');
+
+// Recibir JSON en las solicitudes POST y PUT
 app.use(express.json());
 
-// Ruta de bienvenida
+// Rutas de la API (TP2)
+app.use('/api/productos', productosRouter);
+app.use('/api/usuarios', usuariosRouter);
+app.use('/api/ventas', ventasRouter);
+
+// Servir el frontend desde Express: mismo origen, sin problemas de CORS
 app.get('/', (req, res) => {
-    res.status(200).json({
-        mensaje: '¡Bienvenido a la API de Busticaria!'
-    });
+    res.redirect('/pages/home.html');
+});
+app.use(express.static(directorioFrontend));
+
+// Ruta no encontrada
+app.use((req, res) => {
+    res.status(404).json({ mensaje: 'Ruta no encontrada' });
 });
 
-// Rutas de la API
-app.use('/api/productos', productosRoutes);
-app.use('/api/usuarios', usuariosRoutes);
-app.use('/api/ventas', ventasRoutes);
-
-// Iniciar el servidor
 app.listen(PORT, () => {
-    console.log(`Servidor funcionando en http://localhost:${PORT}`);
+    console.log(`Busticaria: http://localhost:${PORT}/pages/home.html`);
+    console.log(`API productos: http://localhost:${PORT}/api/productos`);
 });

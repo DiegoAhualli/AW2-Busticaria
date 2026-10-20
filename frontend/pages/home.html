@@ -1,16 +1,14 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Busticaria es una tienda online de productos de tecnología, ropa y hogar.">
-
+    <meta name="description" content="Busticaria, tienda online de tecnología, ropa y hogar.">
+    <title>Busticaria - Inicio</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../styles/styles.css">
-
-    <title>Busticaria</title>
 </head>
-
 <body>
     <header id="navbar"></header>
 
@@ -18,48 +16,43 @@
         <section class="hero-busticaria">
             <div class="container">
                 <h1>Bienvenidos a Busticaria</h1>
-                <p>Tu tienda online para encontrar productos de tecnología, ropa y hogar.</p>
-                <a href="#productosHome" class="btn btn-busticaria">
-                    Ver productos destacados
-                </a>
+                <p>Tu tienda online de tecnología, ropa y hogar.</p>
+                <a href="#catalogo" class="btn btn-busticaria">Ver productos</a>
             </div>
         </section>
 
-        <section class="container py-5">
+        <section class="container pt-5">
             <h2 class="mb-4">Categorías</h2>
-
             <div class="row g-3">
                 <div class="col-md-4">
-                    <a href="categories/categoria-tecnologia.html" class="category-card">Tecnología</a>
+                    <a class="category-card" href="categories/categoria-tecnologia.html">Tecnología</a>
                 </div>
-
                 <div class="col-md-4">
-                    <a href="categories/categoria-ropa.html" class="category-card">Ropa</a>
+                    <a class="category-card" href="categories/categoria-ropa.html">Ropa</a>
                 </div>
-
                 <div class="col-md-4">
-                    <a href="categories/categoria-hogar.html" class="category-card">Hogar</a>
+                    <a class="category-card" href="categories/categoria-hogar.html">Hogar</a>
                 </div>
             </div>
         </section>
 
-        <section id="productosHome" class="container my-5">
-            <h2 class="mb-4">Productos destacados</h2>
+        <section id="catalogo" class="container py-5">
+            <h2 class="mb-4">Productos a la venta</h2>
+            <p>Explorá nuestros productos por categoría.</p>
 
-            <h3 class="mb-3">Tecnología</h3>
-            <div id="productosTecnologiaHome" class="row mb-5"></div>
+            <h3 class="h4 mt-4 mb-3">Tecnología</h3>
+            <div class="row" id="productosTecnologiaHome"></div>
 
-            <h3 class="mb-3">Ropa</h3>
-            <div id="productosRopaHome" class="row mb-5"></div>
+            <h3 class="h4 mt-4 mb-3">Ropa</h3>
+            <div class="row" id="productosRopaHome"></div>
 
-            <h3 class="mb-3">Hogar</h3>
-            <div id="productosHogarHome" class="row mb-5"></div>
+            <h3 class="h4 mt-4 mb-3">Hogar</h3>
+            <div class="row" id="productosHogarHome"></div>
         </section>
     </main>
 
     <script src="../components/navbar.component.js"></script>
     <script src="../components/card.component.js"></script>
-    <script src="../api/productos.api.js"></script>
     <script src="./home.controller.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
