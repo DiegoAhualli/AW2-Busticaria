@@ -1,3 +1,4 @@
+
 [
   {
     "id": 1,
@@ -67,6 +68,46 @@
     "precio": 38000,
     "stock": 20,
     "imagen": "webcam.webp",
+    "disponible": true
+  },
+  {
+    "id": 8,
+    "nombre": "Buzo Oversize",
+    "descripcion": "Buzo de algodón con capucha y corte oversize",
+    "categoria": "ropa",
+    "precio": 55000,
+    "stock": 20,
+    "imagen": "buzo.webp",
+    "disponible": true
+  },
+  {
+    "id": 9,
+    "nombre": "Pantalón Cargo",
+    "descripcion": "Pantalón cargo urbano con bolsillos laterales",
+    "categoria": "ropa",
+    "precio": 48000,
+    "stock": 20,
+    "imagen": "pantalon.webp",
+    "disponible": true
+  },
+  {
+    "id": 10,
+    "nombre": "Almohadón Decorativo",
+    "descripcion": "Almohadón decorativo de tela suave para sillón o dormitorio",
+    "categoria": "hogar",
+    "precio": 18000,
+    "stock": 20,
+    "imagen": "almohadon.webp",
+    "disponible": true
+  },
+  {
+    "id": 11,
+    "nombre": "Set de Tazas de Cerámica",
+    "descripcion": "Set de cuatro tazas de cerámica de diseño minimalista",
+    "categoria": "hogar",
+    "precio": 24000,
+    "stock": 20,
+    "imagen": "tazas.webp",
     "disponible": true
   }
 ]
