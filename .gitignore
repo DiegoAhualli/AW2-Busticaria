@@ -1,6 +1,4 @@
-
-# Dependencias de Node.js
+# Dependencias y configuraciones locales
 node_modules/
-
-# Directorio de dependencias generadas por npm
-package-lock.json
+.env
+.DS_Store
