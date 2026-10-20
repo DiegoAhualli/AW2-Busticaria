@@ -1,9 +1,9 @@
 
 import express from 'express';
-import { leerJSON, guardarJSON } from '../data/archivos.mjs';
+import { leerJSON, guardarJSON } from '../../data/archivos.mjs';
 
 const router = express.Router();
-const archivoProductos = './data/productos.json';
+const archivoProductos = '../data/productos.json';
 
 // GET - CONSULTAR TODOS LOS PRODUCTOS
 router.get('/', async (req, res) => {

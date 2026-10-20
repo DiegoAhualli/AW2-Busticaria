@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Busticaria | Registro</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../../styles/styles.css">
+</head>
+<body>
+    <header id="navbar"></header>
+
+    <main class="container auth-container">
+        <section class="auth-card">
+            <h1>Registro de usuario</h1>
+            <p class="auth-subtitle">Creá tu cuenta para comprar en Busticaria</p>
+
+            <form id="formRegistro">
+                <div class="mb-3">
+                    <label class="form-label" for="nombre">Nombre</label>
+                    <input class="form-control" type="text" id="txtnombre" name="nombre" placeholder="Ingrese su nombre" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" for="apellido">Apellido</label>
+                    <input class="form-control" type="text" id="txtapellido" name="apellido" placeholder="Ingrese su apellido" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" for="email">Email</label>
+                    <input class="form-control" type="email" id="txtemail" name="email" placeholder="Ingrese su email" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" for="password">Contraseña</label>
+                    <input class="form-control" type="password" id="txtpassword" name="password" placeholder="Ingrese su contraseña" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" for="fechaNacimiento">Fecha de nacimiento</label>
+                    <input class="form-control" type="date" id="txtfechaNacimiento" name="fechaNacimiento" required>
+                </div>
+
+                <button class="btn btn-busticaria w-100" type="submit">Registrarse</button>
+
+                <p class="text-center mt-3"> ¿Ya tenés cuenta?
+                    <a href="../login/login.html">Iniciá sesión</a>
+                </p>
+            </form>
+        </section>
+    </main>
+
+    <script src="../../../components/navbar.component.js"></script>
+    <script src="./registro.controller.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,11 +1,11 @@
 
 import express from 'express';
-import { leerJSON, guardarJSON } from '../data/archivos.mjs';
+import { leerJSON, guardarJSON } from '../../data/archivos.mjs';
 
 const router = express.Router();
 
-const archivoUsuarios = './data/usuarios.json';
-const archivoVentas = './data/ventas.json';
+const archivoUsuarios = '../data/usuarios.json';
+const archivoVentas = '../data/ventas.json';
 
 // POST - REGISTRAR UN NUEVO USUARIO
 router.post('/', async (req, res) => {

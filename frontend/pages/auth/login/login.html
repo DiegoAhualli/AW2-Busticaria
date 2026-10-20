@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Busticaria | Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../../styles/styles.css">
+</head>
+<body>
+    <header id="navbar"></header>
+
+    <main class="container auth-container">
+        <section class="auth-card">
+            <h1>Iniciar sesión</h1>
+            <p class="auth-subtitle">Ingresá a tu cuenta de Busticaria</p>
+
+            <form id="formLogin">
+                <div class="mb-3">
+                    <label class="form-label" for="email">Email</label>
+                    <input class="form-control" type="email" id="txtemail" name="email" placeholder="Ingrese su email" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" for="password">Contraseña</label>
+                    <input class="form-control" type="password" id="txtpassword" name="password" placeholder="Ingrese su contraseña" required>
+                </div>
+
+                <button class="btn btn-busticaria w-100" type="submit">Ingresar</button>
+
+                <p class="text-center mt-3">
+                    ¿No tiene cuenta? 
+                    <a href="../signin/registro.html">Haga clic aquí para crear una</a>
+                </p>
+            </form>
+        </section>
+    </main>
+
+    <script src="../../../components/navbar.component.js"></script>
+    <script src="./login.controller.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
