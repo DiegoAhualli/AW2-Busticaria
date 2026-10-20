@@ -6,7 +6,7 @@
     "categoria": "tecnologia",
     "precio": 850000,
     "stock": 20,
-    "imagen": "notebook.jpg",
+    "imagen": "notebook.webp",
     "disponible": true
   },
   {
@@ -16,7 +16,7 @@
     "categoria": "tecnologia",
     "precio": 45000,
     "stock": 20,
-    "imagen": "auriculares.jpg",
+    "imagen": "auriculares.webp",
     "disponible": true
   },
   {
@@ -26,7 +26,7 @@
     "categoria": "ropa",
     "precio": 28000,
     "stock": 20,
-    "imagen": "remera.jpg",
+    "imagen": "remera.webp",
     "disponible": true
   },
   {
@@ -36,7 +36,7 @@
     "categoria": "hogar",
     "precio": 32000,
     "stock": 20,
-    "imagen": "lampara.jpg",
+    "imagen": "lampara.webp",
     "disponible": true
   },
   {
@@ -46,7 +46,7 @@
     "categoria": "tecnologia",
     "precio": 65000,
     "stock": 20,
-    "imagen": "teclado.jpg",
+    "imagen": "teclado.webp",
     "disponible": true
   },
   {
@@ -56,7 +56,7 @@
     "categoria": "tecnologia",
     "precio": 25000,
     "stock": 20,
-    "imagen": "mouse.jpg",
+    "imagen": "mouse.webp",
     "disponible": true
   },
   {
@@ -66,7 +66,7 @@
     "categoria": "tecnologia",
     "precio": 38000,
     "stock": 20,
-    "imagen": "webcam.jpg",
+    "imagen": "webcam.webp",
     "disponible": true
   }
 ]
