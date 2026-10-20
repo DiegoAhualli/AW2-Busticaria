@@ -4,11 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carrito | Busticaria</title>
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../../styles/styles.css">
 </head>
-
 <body>
     <header id="navbar"></header>
 
@@ -17,12 +15,20 @@
 
         <section id="contenedorCarrito" class="row g-4"></section>
 
+        <div class="row justify-content-end mt-3">
+            <div class="col-12 col-md-6">
+                <label for="txtDireccionEnvio" class="form-label">Dirección de entrega</label>
+                <input class="form-control" id="txtDireccionEnvio" type="text"
+                       placeholder="Ej.: Av. Colón 1500, Córdoba" minlength="5" maxlength="200" required>
+                <p class="form-text">La orden se registra como pendiente de pago.</p>
+            </div>
+        </div>
+
         <div class="d-flex gap-3 justify-content-end mt-4">
-            <button id="btnVolverComprar" class="btn btn-outline-secondary">
+            <button id="btnVolverComprar" class="btn btn-outline-secondary" type="button">
                 Agregar más productos
             </button>
-
-            <button id="btnRealizarCompra" class="btn btn-busticaria">
+            <button id="btnRealizarCompra" class="btn btn-busticaria" type="button">
                 Realizar compra
             </button>
         </div>

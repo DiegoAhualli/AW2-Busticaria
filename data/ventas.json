@@ -48,5 +48,37 @@
         "cantidad": 1
       }
     ]
+  },
+  {
+    "id": 4,
+    "id_usuario": 6,
+    "fecha": "2026-10-20",
+    "total": 2640000,
+    "direccion": "Calle Real 123, Córdoba",
+    "pagada": false,
+    "productos": [
+      {
+        "id_producto": 1,
+        "cantidad": 3
+      },
+      {
+        "id_producto": 2,
+        "cantidad": 2
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "id_usuario": 6,
+    "fecha": "2026-10-20",
+    "total": 1700000,
+    "direccion": "Calle Real 123, Córdoba",
+    "pagada": false,
+    "productos": [
+      {
+        "id_producto": 1,
+        "cantidad": 2
+      }
+    ]
   }
 ]
