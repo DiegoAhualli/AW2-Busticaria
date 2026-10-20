@@ -1,6 +1,6 @@
 function crearCardProducto(producto) {
     return `
-        <article class="col-md-4 mb-4" id="${producto.destacado ? 'Playstation 5' : ''}">
+        <article class="col-md-4 mb-4" data-id="${producto.id}">
             <div class="card h-100 shadow-sm">
 
                 <img src="${producto.imagen}" 
