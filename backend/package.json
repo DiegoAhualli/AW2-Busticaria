@@ -1,15 +1,13 @@
+
 {
   "name": "aw2-busticaria",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Backend de Busticaria - Aplicaciones Web II",
+  "main": "server.mjs",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.mjs"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
   "dependencies": {
     "express": "^5.2.1"
   }
