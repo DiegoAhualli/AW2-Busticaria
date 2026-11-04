@@ -14,13 +14,13 @@ import {
 
 const router = express.Router();
 
-// Obtener todos los productos
+// GET - Obtener todos los productos
 router.get('/', listarProductos);
 
-// Registrar un producto nuevo
+// POST - Registrar un producto nuevo
 router.post('/', validarNuevoProducto, agregarProducto);
 
-// Actualizar el stock de un producto
+// PUT - Actualizar el stock de un producto
 router.put('/:id', validarStock, actualizarStock);
 
 export default router;
