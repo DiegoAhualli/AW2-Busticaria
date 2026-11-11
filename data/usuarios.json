@@ -46,5 +46,13 @@
     "email": "aa@mail.com",
     "password": "scrypt:453f7e5c06c3339832905a8aa05fa4ed:118d3cf70dfe243ebcbbd7fd677c093401bf6799e58e8078a97c2ddf320df72f575726505624d6caaf73009b053d5784827f789f38d7171ea269c06daf78eab2",
     "activo": true
+  },
+  {
+    "id": 7,
+    "nombre": "Usuario",
+    "apellido": "Prueba",
+    "email": "usuario.prueba@example.com",
+    "password": "scrypt:a9e9ac2e383346c191ed90ae9b5c6ed1:bfc25c306ab826a37101938695ee84a5153dc084cbc36fe7944900c1ad524409495e0fed4d185a009872bcaed740f022cb8016edcbeeda9926905bc9f99d45b5",
+    "activo": true
   }
 ]
