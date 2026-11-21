@@ -146,6 +146,18 @@ Las solicitudes y las validaciones de la API se pueden comprobar mediante la col
 
 [Ver la presentación de Busticaria en YouTube](https://youtu.be/QZNCGFliHQc)
 
+## Roadmap — Futuras mejoras
+
+Como posibles mejoras para próximas versiones de Busticaria se contemplan:
+
+1. **Recuperación de contraseñas:** permitir restablecer el acceso mediante enlaces temporales enviados por correo electrónico.
+2. **Roles y permisos:** diferenciar las funcionalidades disponibles para clientes y administradores.
+3. **Historial de pedidos:** incorporar una sección donde cada usuario pueda consultar sus compras y estados.
+4. **Despliegue web:** publicar la aplicación en un entorno accesible mediante HTTPS.
+5. **Pagos de prueba:** integrar una pasarela de pagos en modo de pruebas, sin efectuar cobros reales.
+
+Estas funcionalidades forman parte de la planificación futura y no están implementadas en la versión actual.
+
 ## Alcance
 
 Busticaria es un proyecto académico de ecommerce. Las órdenes de compra se registran en el sistema, pero no se realizan cobros reales ni se utiliza una pasarela de pagos.
