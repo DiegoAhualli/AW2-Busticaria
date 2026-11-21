@@ -1,520 +1,318 @@
-
 # 🛒 Busticaria - Aplicaciones Web II
 
-## 👨‍💻 Autor
+## 👨‍💻 Autor y materia
 
-**Diego Ahualli**
+**Autor:** Diego Ahualli
 
----
+**Materia:** Aplicaciones Web II
+
+**Institución:** Colegio Universitario IES Siglo 21
+
+**Repositorio:** https://github.com/DiegoAhualli/AW2-Busticaria
 
 ## 📖 Descripción
 
-**Busticaria** es una aplicación web de ecommerce que comencé a desarrollar en Aplicaciones Web I y que continué en Aplicaciones Web II, en el Colegio Universitario IES 21.
-
-En **AW1** trabajé principalmente con el frontend: páginas HTML, estilos, navegación, categorías, carrito de compras, un login simulado y almacenamiento en el navegador.
-
-En **AW2** incorporé un servidor con Node.js y Express.js para trabajar con datos propios en formato JSON y conectar las funcionalidades del frontend con el backend.
-
-Este documento describe las primeras tres entregas del trabajo práctico. La cuarta entrega corresponde a la integración con una base de datos no relacional y autenticación.
-
----
-
-## 🛠️ Tecnologías utilizadas
-
-- **HTML, CSS y JavaScript:** desarrollo del frontend.
-- **Bootstrap:** estilos y diseño responsive.
-- **Node.js:** entorno de ejecución del servidor.
-- **Express.js:** servidor y rutas de la API REST.
-- **JSON:** almacenamiento de usuarios, productos y ventas.
-- **Fetch API:** comunicación entre frontend y backend.
-- **localStorage:** persistencia del carrito de compras.
-- **sessionStorage:** almacenamiento de la sesión simulada.
-- **Postman:** pruebas de los endpoints.
-- **Git y GitHub:** control de versiones.
-
----
-
-# 📦 Primera entrega - Estructuras JSON
-
-En esta primera entrega creé las estructuras de datos que utiliza el ecommerce.
-
-Los archivos se encuentran en la carpeta `data/`:
-
-- `usuarios.json`
-- `productos.json`
-- `ventas.json`
-
-## 1. usuarios.json
-
-Contiene la información de las cuentas registradas.
-
-Cada usuario tiene:
-
-- ID.
-- Nombre.
-- Apellido.
-- Email.
-- Contraseña.
-- Estado de la cuenta (activo o inactivo).
-
-En la integración posterior con el backend, incorporé el almacenamiento de contraseñas nuevas mediante un hash con `scrypt`.
-
-Los registros de ejemplo iniciales se mantienen por compatibilidad.
-
-## 2. productos.json
-
-Contiene los productos que ofrece Busticaria.
-
-Cada producto tiene:
-
-- ID.
-- Nombre.
-- Descripción.
-- Categoría.
-- Precio.
-- Stock.
-- Imagen.
-- Disponibilidad.
-
-Las categorías utilizadas son:
-
-- Tecnología.
-- Ropa.
-- Hogar.
-
-## 3. ventas.json
-
-Contiene las órdenes de compra registradas.
-
-Cada venta tiene:
-
-- ID de venta.
-- ID del usuario.
-- Fecha.
-- Total.
-- Dirección de entrega.
-- Estado de pago.
-- Productos comprados y sus cantidades.
-
-Los archivos se relacionan mediante identificadores.
-
-Por ejemplo, el campo `id_usuario` indica quién realizó la compra y `id_producto` identifica cada artículo comprado.
-
----
-
-# 🌐 Segunda entrega - API REST con Express.js
-
-En la segunda entrega desarrollé un servidor con Node.js y Express.js para consultar y modificar los datos almacenados en los archivos JSON.
-
-Organicé las rutas según el recurso que administran:
-
-- `backend/routes/productos.mjs`
-- `backend/routes/usuarios.mjs`
-- `backend/routes/ventas.mjs`
-
-También creé `data/archivos.mjs`, que contiene las funciones:
-
-- `leerJSON()`
-- `guardarJSON()`
-
-Estas funciones utilizan `fs/promises` para leer y escribir archivos de manera asíncrona, evitando repetir el mismo código en cada endpoint.
-
-## Endpoints implementados
-
-| Método | Ruta | Descripción |
-|---|---|---|
-| GET | `/api/productos` | Consultar todos los productos |
-| GET | `/api/ventas` | Consultar las ventas registradas |
-| POST | `/api/productos` | Registrar un producto nuevo |
-| POST | `/api/usuarios` | Registrar un usuario nuevo |
-| PUT | `/api/productos/:id` | Actualizar el stock de un producto |
-| DELETE | `/api/usuarios/:id` | Eliminar un usuario sin ventas relacionadas |
-
-## Funcionamiento de las rutas
-
-### GET - Consultar información
-
-Permite obtener los productos y las ventas almacenadas en los archivos JSON.
-
-### POST - Registrar información
-
-Permite incorporar nuevos productos y usuarios, realizando validaciones antes de guardar los cambios.
-
-### PUT - Actualizar información
-
-Permite modificar el stock de un producto existente y actualizar su disponibilidad.
-
-### DELETE - Eliminar información
-
-Permite eliminar un usuario siempre que no tenga ventas registradas.
-
-Esta validación evita dejar ventas relacionadas con usuarios que ya no existen.
-
-Los endpoints devuelven respuestas JSON y códigos de estado HTTP según el resultado de cada operación.
-
-Las rutas fueron trabajadas y probadas utilizando **Postman**.
-
----
-
-# 🛍️ Tercera entrega - Integración de Frontend y Backend
-
-En esta entrega conecté el frontend que había desarrollado en Aplicaciones Web I con el servidor Express de Aplicaciones Web II.
-
-El objetivo fue utilizar nuestros propios datos JSON para mostrar productos, registrar usuarios y generar órdenes de compra.
-
-## 1. Listado de productos
-
-El Home obtiene los productos mediante una solicitud:
-
-`GET /api/productos`
-
-La consulta se realiza utilizando `fetch()` desde `home.controller.js`.
-
-Los productos se muestran mediante el componente `crearCardProducto()`, que genera las tarjetas HTML.
-
-Se muestran solamente los productos que están disponibles y tienen stock mayor a cero.
-
-**Archivos principales:**
-
-- `frontend/pages/home.controller.js`
-- `frontend/components/card.component.js`
-- `backend/routes/productos.mjs`
-- `backend/controllers/productos.controller.mjs`
-
-## 2. Filtrado por categorías
-
-Busticaria tiene tres categorías:
-
-- **Tecnología**
-- **Ropa**
-- **Hogar**
-
-Las tres páginas utilizan el mismo controlador: `categoria.controller.js`.
-
-Este controlador identifica la página abierta, consulta los productos al servidor y filtra los resultados según el campo `categoria`.
-
-De esta forma evitamos crear un controlador diferente para cada sección.
-
-También permite seleccionar cantidades y agregar productos al carrito.
-
-**Archivo principal:**
-
-`frontend/pages/categories/categoria.controller.js`
-
-## 3. Registro de usuarios
-
-El formulario de registro está conectado con el endpoint:
-
-`POST /api/usuarios`
-
-Cuando el usuario completa el formulario, JavaScript obtiene los datos y los envía al backend mediante `fetch()`.
-
-Express realiza las validaciones correspondientes, comprueba que el email no esté registrado y guarda el nuevo usuario en `usuarios.json`.
-
-Las contraseñas nuevas se almacenan utilizando un hash con `scrypt`.
-
-Una vez registrado, el usuario es redirigido a la pantalla de login.
-
-**Archivos principales:**
-
-- `frontend/pages/auth/signin/registro.controller.js`
-- `backend/routes/usuarios.mjs`
-- `backend/controllers/usuarios.controller.mjs`
-
-## 4. Inicio de sesión
-
-Para iniciar sesión se utiliza:
-
-`POST /api/usuarios/login`
-
-El frontend envía el email y la contraseña al servidor.
-
-Express busca la cuenta, verifica las credenciales y comprueba que el usuario esté activo.
-
-Si los datos son correctos, devuelve la información pública de la cuenta.
-
-El frontend guarda esa información en `sessionStorage`, incluyendo el ID del usuario.
-
-Este ID se utiliza posteriormente para relacionar una orden de compra con el usuario que la realizó.
-
-No se guarda la contraseña en la sesión del navegador.
-
-**Archivos principales:**
-
-- `frontend/pages/auth/login/login.controller.js`
-- `backend/routes/usuarios.mjs`
-- `backend/controllers/usuarios.controller.mjs`
-
-## 5. Carrito de compras
-
-El carrito utiliza `localStorage` para conservar los productos seleccionados.
-
-De esta manera, los productos continúan guardados aunque el usuario cambie de página o recargue el navegador.
-
-**Funcionalidades implementadas:**
-
-- Agregar productos.
-- Aumentar cantidades.
-- Disminuir cantidades.
-- Eliminar productos.
-- Consultar el subtotal de cada artículo.
-- Consultar el total estimado.
-
-Antes de aumentar cantidades se comprueba el stock informado por el servidor.
-
-**Archivo principal:**
-
-`frontend/pages/carrito/carrito.controller.js`
-
-## 6. Registro de compras
-
-Esta funcionalidad conecta el carrito con el backend.
-
-Cuando el usuario realiza una compra, debe ingresar una dirección de entrega y confirmar la operación.
-
-El frontend envía una solicitud:
-
-`POST /api/ventas`
-
-**Datos enviados:**
-
-- ID del usuario.
-- Dirección de entrega.
-- ID de cada producto.
-- Cantidad de cada producto.
-
-**El backend se encarga de:**
-
-1. Validar los datos recibidos.
-2. Verificar que el usuario exista y esté activo.
-3. Comprobar que los productos existan.
-4. Controlar que haya stock suficiente.
-5. Calcular el total utilizando los precios guardados en `productos.json`.
-6. Descontar el stock de los productos comprados.
-7. Registrar la nueva orden en `ventas.json`.
-8. Devolver una confirmación con el ID y el total de la compra.
-
-El carrito se vacía únicamente cuando el servidor confirma que la orden fue registrada.
-
-Si la operación es rechazada, los productos permanecen en el carrito.
-
-Las compras nuevas se registran con `pagada: false`, ya que este trabajo simula el registro de una orden y no incorpora pagos reales.
-
-**Archivos principales:**
-
-- `backend/routes/ventas.mjs`
-- `backend/controllers/ventas.controller.mjs`
-- `frontend/pages/carrito/carrito.controller.js`
-- `data/productos.json`
-- `data/ventas.json`
-
----
-
-# 📂 Estructura del proyecto
+Busticaria es un ecommerce académico iniciado en Aplicaciones Web I y ampliado durante las cuatro entregas de Aplicaciones Web II. Permite consultar productos, filtrar categorías, registrar usuarios, iniciar sesión, administrar un carrito y registrar órdenes de compra simuladas.
+
+La cuarta entrega reemplaza la persistencia operativa en archivos JSON por MongoDB Atlas, almacena las contraseñas nuevas con Bcrypt e incorpora autenticación mediante JSON Web Tokens para autorizar las compras. Los JSON originales se conservan como respaldo y fuente de migración, pero los endpoints ya no escriben en ellos.
+
+## ✨ Funcionalidades
+
+- Catálogo de productos y filtrado por Tecnología, Ropa y Hogar.
+- Registro de usuarios con contraseñas Bcrypt.
+- Login con emisión de JWT y control de cuentas activas.
+- Compatibilidad de acceso para hashes `scrypt` de la tercera entrega.
+- Carrito persistido en `localStorage`.
+- Token de la sesión guardado temporalmente en `sessionStorage`.
+- Compra protegida mediante `Authorization: Bearer TOKEN`.
+- Cálculo de precios y total exclusivamente en el backend.
+- Validación de productos, cantidades, disponibilidad y stock.
+- Descuento de stock y alta de venta dentro de una transacción MongoDB.
+- CRUD de productos con operaciones GET, POST, PUT y DELETE.
+- Protección de usuarios y productos que tienen ventas relacionadas.
+- Migración JSON idempotente, con validación de estructuras y relaciones.
+- Colección Postman y script de pruebas integrales.
+
+## 🧰 Tecnologías y dependencias
+
+### Frontend
+
+- HTML5, CSS3 y JavaScript.
+- Bootstrap.
+- Fetch API.
+- `localStorage` para el carrito.
+- `sessionStorage` para los datos públicos del usuario y el JWT de la pestaña.
+
+### Backend
+
+- Node.js con módulos ES.
+- Express.js.
+- Driver oficial `mongodb`.
+- `bcrypt` para hashing y comparación de contraseñas.
+- `jsonwebtoken` para firma y verificación de JWT.
+- `dotenv` para variables de entorno.
+
+Las versiones exactas instaladas están declaradas en `backend/package.json` y `backend/package-lock.json`.
+
+## 📂 Arquitectura
 
 ```text
 AW2-Busticaria/
-│
 ├── backend/
-│   │
+│   ├── config/
+│   │   ├── entorno.mjs
+│   │   └── mongodb.mjs
 │   ├── controllers/
 │   │   ├── productos.controller.mjs
 │   │   ├── usuarios.controller.mjs
 │   │   └── ventas.controller.mjs
-│   │
 │   ├── middleware/
+│   │   ├── autenticarJWT.mjs
 │   │   └── validarProductos.mjs
-│   │
 │   ├── routes/
 │   │   ├── productos.mjs
 │   │   ├── usuarios.mjs
 │   │   └── ventas.mjs
-│   │
+│   ├── scripts/
+│   │   ├── migrar-json-mongodb.mjs
+│   │   └── probar-api.mjs
+│   ├── services/
+│   │   └── contadores.mjs
+│   ├── utils/
+│   │   ├── ErrorHTTP.mjs
+│   │   ├── jwt.mjs
+│   │   └── passwords.mjs
 │   ├── package.json
-│   ├── package-lock.json
 │   └── server.mjs
-│
 ├── data/
 │   ├── archivos.mjs
 │   ├── productos.json
 │   ├── usuarios.json
 │   └── ventas.json
-│
 ├── frontend/
 │   ├── assets/
 │   ├── components/
 │   ├── pages/
 │   ├── styles/
 │   └── index.html
-│
-├── .gitignore
+├── postman/
+│   └── Busticaria-Entrega-4.postman_collection.json
+├── .env.example
+├── ENTREGA_FINAL.md
+├── INFORME_PRUEBAS.md
 └── README.md
 ```
 
-## Organización del backend
+Las rutas reciben las solicitudes HTTP, los middleware validan datos o autenticación y los controladores aplican las reglas de negocio. `config/mongodb.mjs` administra una conexión reutilizable, crea los índices y comprueba el soporte de transacciones. La colección interna `contadores` genera IDs numéricos sin consultar el máximo de cada colección en cada alta.
 
-A partir de la devolución docente de la tercera entrega, se reorganizó el backend utilizando **controladores y middleware** para separar responsabilidades.
+## ⚙️ Instalación y configuración
 
-### Routes
+### Requisitos
 
-Contienen los endpoints de Express correspondientes a productos, usuarios y ventas.
-
-Cada ruta establece qué controlador debe ejecutarse cuando llega una solicitud HTTP.
-
-### Controllers
-
-Contienen la lógica de cada recurso, incluyendo consultas, registros, actualizaciones y validaciones de negocio.
-
-Los controladores se encuentran separados en:
-
-- `productos.controller.mjs`
-- `usuarios.controller.mjs`
-- `ventas.controller.mjs`
-
-### Middleware
-
-Permite validar las solicitudes antes de ejecutar los controladores.
-
-En Productos se utiliza `validarProductos.mjs` para verificar los datos recibidos antes de crear productos o actualizar stock.
-
-### Data
-
-Contiene los archivos JSON y las funciones compartidas de lectura y escritura.
-
-Esta reorganización permite mantener el código más ordenado, facilita su mantenimiento y conserva las funcionalidades implementadas.
-
-También se corrigió la configuración del archivo `package.json` para utilizar módulos ECMAScript y permitir el inicio del servidor mediante `npm start`.
-
-La persistencia continúa realizándose mediante archivos JSON. La integración con bases de datos NoSQL corresponde a la cuarta entrega del trabajo práctico.
-
----
-
-# 🚀 Instalación y ejecución
-
-## Requisitos
-
-- Tener instalado Node.js.
-- Tener npm disponible.
-- Contar con un navegador web.
-- Tener Git instalado para clonar el repositorio.
-
-## Pasos para ejecutar Busticaria
+- Node.js 20 o superior.
+- npm.
+- Un clúster MongoDB Atlas accesible desde la IP actual.
+- Un usuario de Atlas con permisos de lectura y escritura sobre la base `busticaria`.
 
 ### 1. Clonar el repositorio
 
-Abrir una terminal y ejecutar:
-
 ```bash
 git clone https://github.com/DiegoAhualli/AW2-Busticaria.git
+cd AW2-Busticaria
 ```
 
-### 2. Ingresar a la carpeta del backend
+### 2. Crear `.env` en la raíz
 
-```bash
-cd AW2-Busticaria/backend
+Copiar `.env.example` como `.env` en la **raíz del repositorio**, no dentro de `backend`:
+
+```dotenv
+MONGODB_URI=mongodb+srv://USUARIO:CONTRASENA@HOST.mongodb.net/busticaria?retryWrites=true&w=majority
+JWT_SECRET=UN_SECRETO_ALEATORIO_DE_AL_MENOS_32_CARACTERES
+PORT=3000
 ```
 
-**Importante:** los siguientes comandos deben ejecutarse dentro de la carpeta `backend`, ya que allí se encuentra el archivo `package.json`.
-
-### 3. Instalar las dependencias
+Se puede generar un secreto aleatorio localmente con:
 
 ```bash
+node -e "console.log(require('node:crypto').randomBytes(48).toString('base64url'))"
+```
+
+El contenido de `.env` está ignorado por Git. No debe copiarse a la documentación, Postman, capturas ni commits.
+
+### 3. Instalar dependencias
+
+El `package.json` se encuentra dentro de `backend`:
+
+```bash
+cd backend
 npm install
 ```
 
-Este comando instala las dependencias necesarias para ejecutar el servidor Express.
+### 4. Migrar los JSON a MongoDB
 
-### 4. Iniciar el servidor
+```bash
+npm run migrate
+```
+
+La migración:
+
+1. Lee y valida `usuarios.json`, `productos.json` y `ventas.json`.
+2. Comprueba IDs, emails y relaciones.
+3. Conserva los IDs numéricos históricos.
+4. Convierte contraseñas históricas en texto plano a Bcrypt.
+5. Conserva temporalmente hashes `scrypt` válidos.
+6. Inserta por ID sin duplicar documentos existentes.
+7. Crea índices únicos para IDs y email.
+8. Inicializa los contadores y verifica las cantidades migradas.
+
+El comando puede repetirse sin duplicar registros. Los archivos JSON originales no se modifican y no funcionan como persistencia operativa.
+
+### 5. Iniciar Busticaria
+
+Desde `backend`:
 
 ```bash
 npm start
 ```
 
-Si todo funciona correctamente, la consola mostrará:
+Abrir:
 
-```text
-Busticaria: http://localhost:3000/pages/home.html
-API productos: http://localhost:3000/api/productos
+- Aplicación: http://localhost:3000
+- API de productos: http://localhost:3000/api/productos
+
+Express entrega el frontend y la API desde el mismo origen.
+
+## 🍃 MongoDB
+
+La base lógica utilizada es `busticaria` y contiene:
+
+- `usuarios`: datos de cuenta y hash de contraseña.
+- `productos`: catálogo, precio, stock y disponibilidad.
+- `ventas`: órdenes y referencias mediante IDs lógicos.
+- `contadores`: secuencias internas para generar IDs sin colisiones.
+
+Los índices únicos evitan IDs y emails duplicados. MongoDB agrega `_id`, pero el contrato público conserva `id`, `id_usuario` e `id_producto` para mantener la compatibilidad con el frontend y los datos anteriores.
+
+## 🔐 Bcrypt y contraseñas históricas
+
+Las cuentas nuevas se guardan exclusivamente con Bcrypt y costo 10. La API nunca devuelve el campo `password` ni imprime contraseñas o hashes.
+
+La migración convierte a Bcrypt las claves históricas que estaban en texto plano. Un hash `scrypt` no puede convertirse sin conocer la contraseña original, por eso se verifica con el algoritmo anterior. Después de un login `scrypt` correcto, el servidor crea un hash Bcrypt con la contraseña recién proporcionada y actualiza únicamente ese campo.
+
+## 🎫 Autenticación JWT
+
+`POST /api/usuarios/login` devuelve los datos públicos del usuario y un JWT:
+
+```json
+{
+  "mensaje": "Inicio de sesión correcto",
+  "usuario": {
+    "id": 8,
+    "nombre": "Usuario",
+    "apellido": "Prueba",
+    "email": "usuario@example.com",
+    "activo": true
+  },
+  "token": "JWT_GENERADO"
+}
 ```
 
-### 5. Abrir la aplicación
+El token usa HS256, emisor y audiencia definidos y una expiración de dos horas. Solo incluye el ID lógico del usuario en `sub`.
 
-Ingresar desde el navegador a:
+Las compras requieren:
 
-**http://localhost:3000**
+```http
+Authorization: Bearer TOKEN
+```
 
-El servidor redirige automáticamente a la página principal de Busticaria.
+La compra no confía en el `id_usuario` recibido desde el navegador. Obtiene la identidad de `sub`, consulta que la cuenta continúe activa y rechaza cualquier ID enviado que no coincida.
 
-También se puede consultar directamente el listado de productos desde:
+### Estrategia del navegador
 
-**http://localhost:3000/api/productos**
+El frontend conserva el token en `sessionStorage`, por lo que se elimina al cerrar la pestaña y no queda persistido indefinidamente. Esta solución es adecuada para el alcance académico y permite enviar Bearer desde `fetch`.
 
-Es importante ejecutar el frontend desde Express, ya que necesita comunicarse con las rutas de la API.
+Como limitación, un token accesible desde JavaScript puede quedar expuesto ante una vulnerabilidad XSS. En una versión productiva deberían evaluarse cookies HttpOnly, CSP estricta, refresh tokens y protección CSRF según la arquitectura elegida.
 
-Para detener el servidor, utilizar `Ctrl + C` en la terminal.
+## 🛍️ Integridad de las compras
+
+`POST /api/ventas` ejecuta dentro de una transacción:
+
+1. Validación del JWT y de la cuenta activa.
+2. Validación de dirección, IDs, cantidades y productos repetidos.
+3. Actualización condicional si todavía existe stock suficiente.
+4. Cálculo del total con precios leídos desde MongoDB.
+5. Descuento de stock y actualización de `disponible`.
+6. Inserción de la venta con `pagada: false`.
+
+Si falla cualquier paso, MongoDB revierte la transacción y la API no confirma la compra. El filtro de stock impide vender más unidades que las disponibles ante solicitudes simultáneas. El servidor comprueba al iniciar que la instancia admita transacciones.
+
+## 📡 Endpoints
+
+| Método | Ruta | Autenticación | Descripción |
+|---|---|---|---|
+| GET | `/api/productos` | No | Lista el catálogo |
+| GET | `/api/productos/:id` | No | Obtiene un producto |
+| POST | `/api/productos` | No | Crea un producto |
+| PUT | `/api/productos/:id` | No | Actualiza stock y disponibilidad |
+| DELETE | `/api/productos/:id` | No | Elimina un producto sin ventas |
+| POST | `/api/usuarios` | No | Registra una cuenta con Bcrypt |
+| POST | `/api/usuarios/login` | No | Valida credenciales y emite JWT |
+| DELETE | `/api/usuarios/:id` | No | Elimina un usuario sin ventas |
+| GET | `/api/ventas` | No | Lista las ventas del proyecto |
+| POST | `/api/ventas` | Bearer JWT | Registra una compra atómica |
+
+Los endpoints mantienen respuestas JSON y utilizan, según el caso, `200`, `201`, `400`, `401`, `403`, `404`, `409`, `500` o `503`.
+
+## 🧪 Pruebas
+
+### Script integral
+
+Con el servidor iniciado y las variables configuradas:
+
+```bash
+npm run test:api
+```
+
+El script usa datos ficticios únicos, verifica 36 condiciones y elimina esos datos temporales al finalizar. Incluye CRUD, Bcrypt, login correcto e incorrecto, usuario inactivo, token ausente, inválido y vencido, suplantación de usuario, producto inexistente, stock insuficiente, compra válida, persistencia y dos compras simultáneas por la última unidad.
+
+Los resultados ejecutados el 20 de noviembre de 2026 están documentados en `INFORME_PRUEBAS.md`.
+
+### Postman
+
+Importar:
+
+```text
+postman/Busticaria-Entrega-4.postman_collection.json
+```
+
+La colección contiene variables para la URL base, token e identificadores de prueba. No contiene la URI de Atlas, el secreto JWT ni credenciales reales.
+
+## 🚀 Mejoras de la cuarta entrega
+
+- Persistencia activa migrada de JSON a MongoDB Atlas.
+- Migración segura, verificable e idempotente.
+- Índices de unicidad y contadores atómicos.
+- Bcrypt para cuentas nuevas y migración de claves planas.
+- Compatibilidad y actualización progresiva de cuentas `scrypt`.
+- Emisión y validación de JWT.
+- Compra autorizada por identidad firmada.
+- Transacciones para mantener venta y stock consistentes.
+- CRUD completo de productos.
+- Frontend adaptado a Bearer JWT sin rediseño visual.
+- Pruebas automatizadas y colección Postman.
+
+## 🎥 Video explicativo
+
+**Enlace definitivo del video:** PENDIENTE DE INCORPORAR
+
+El enlace debe reemplazarse después de grabar, publicar y comprobar los permisos de acceso del video.
+
+## ℹ️ Alcance
+
+Busticaria registra órdenes simuladas y no incluye una pasarela de pagos. Las ventas nuevas permanecen con `pagada: false`. El proyecto mantiene un alcance académico y no implementa recuperación pública de contraseñas, refresh tokens, roles administrativos ni despliegue productivo.
 
 ---
 
-# 🧪 Guía de pruebas para el docente
-
-Para comprobar el funcionamiento de la tercera entrega, se puede realizar el siguiente recorrido:
-
-1. Abrir el Home y verificar que aparezcan los productos disponibles.
-2. Ingresar a las categorías Tecnología, Ropa y Hogar.
-3. Comprobar que cada página muestre los productos correspondientes.
-4. Registrar un usuario de prueba.
-5. Iniciar sesión con ese usuario.
-6. Seleccionar un producto y agregarlo al carrito.
-7. Cambiar de página y volver al carrito para verificar que se conserve.
-8. Modificar las cantidades de los productos.
-9. Ingresar una dirección y confirmar la compra.
-10. Consultar `data/ventas.json` para comprobar que se registró la orden.
-11. Consultar `data/productos.json` para comprobar que se descontó el stock.
-12. Realizar una prueba con stock insuficiente para verificar que la operación sea rechazada.
-
-## Pruebas de endpoints con Postman
-
-Para revisar la segunda entrega también se pueden probar los endpoints GET, POST, PUT y DELETE utilizando Postman.
-
-| Método | Endpoint | Funcionalidad |
-|---|---|---|
-| GET | `/api/productos` | Listar productos |
-| GET | `/api/ventas` | Listar ventas |
-| POST | `/api/productos` | Registrar producto |
-| POST | `/api/usuarios` | Registrar usuario |
-| POST | `/api/usuarios/login` | Iniciar sesión |
-| POST | `/api/ventas` | Registrar compra |
-| PUT | `/api/productos/:id` | Modificar stock |
-| DELETE | `/api/usuarios/:id` | Eliminar usuario |
-
-**URL base de la API:**
-
-`http://localhost:3000/api`
-
-Las operaciones que modifican datos quedan guardadas en los archivos JSON, por lo que se recomienda utilizar información ficticia durante las pruebas y conservar una copia de los datos originales.
-
----
-
-# 🔐 Alcance del proyecto
-
-Busticaria fue desarrollado como un proyecto académico para la materia **Aplicaciones Web II**.
-
-Para esta etapa se utilizaron archivos JSON como mecanismo de persistencia, sin incorporar todavía una base de datos.
-
-La aplicación utiliza `sessionStorage` para simular el estado de inicio de sesión en el frontend.
-
-Este mecanismo no representa una autenticación segura en el servidor, ya que todavía no se implementaron tokens de acceso ni mecanismos de autorización para las operaciones protegidas.
-
-Las contraseñas de las cuentas nuevas se almacenan utilizando un hash con `scrypt`, mientras que las cuentas de ejemplo iniciales mantienen compatibilidad con el formato anterior.
-
-Tampoco se implementó una pasarela de pagos, por lo que las órdenes nuevas se registran como pendientes de pago.
-
-El objetivo principal de la tercera entrega fue **integrar el frontend con Express, consumir la API propia y registrar las operaciones del ecommerce utilizando archivos JSON**.
-
-La incorporación de bases de datos no relacionales y autenticación mediante tokens corresponde a la cuarta entrega.
-
----
-
-**Aplicaciones Web II - Colegio Universitario IES 21**
+**Aplicaciones Web II - Colegio Universitario IES Siglo 21**
 
 **Desarrollado por Diego Ahualli**
