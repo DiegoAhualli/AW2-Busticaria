@@ -1,3 +1,4 @@
+/* Paleta */
 :root {
     --color-primario: #4b2e2b;
     --color-secundario: #cb997e;
@@ -6,6 +7,7 @@
     --color-blanco: #ffffff;
 }
 
+/* Base */
 body {
     font-family: Arial, sans-serif;
     background-color: var(--color-fondo);
@@ -28,6 +30,7 @@ main {
     padding: 20px;
 }
 
+/* Portada */
 .hero-busticaria {
     padding: 1rem 0;
     background: linear-gradient(135deg, var(--color-primario), var(--color-acento));
@@ -45,6 +48,7 @@ main {
     max-width: 600px;
 }
 
+/* Navegación */
 .navbar {
     background-color: var(--color-primario) !important;
 }
@@ -59,6 +63,7 @@ main {
     color: var(--color-secundario) !important;
 }
 
+/* Botones */
 .btn-danger {
     background-color: var(--color-secundario);
     border: none;
@@ -81,6 +86,7 @@ main {
     color: var(--color-blanco);
 }
 
+/* Categorías */
 .category-card {
     display: block;
     padding: 1.5rem;
@@ -100,6 +106,7 @@ main {
     background-color: var(--color-primario);
 }
 
+/* Productos */
 .product-card {
     overflow: hidden;
 }
@@ -140,6 +147,7 @@ main {
     box-shadow: 0 16px 35px rgba(0,0,0,0.12);
 }
 
+/* Autenticación */
 .auth-container {
     min-height: calc(100vh - 4.5rem);
     display: flex;
