@@ -275,6 +275,7 @@ npm run test:api
 
 El script usa datos ficticios únicos, verifica 36 condiciones y elimina esos datos temporales al finalizar. Incluye CRUD, Bcrypt, login correcto e incorrecto, usuario inactivo, token ausente, inválido y vencido, suplantación de usuario, producto inexistente, stock insuficiente, compra válida, persistencia y dos compras simultáneas por la última unidad.
 
+Los resultados ejecutados el 20 de noviembre de 2026 están documentados en `INFORME_PRUEBAS.md`.
 
 ### Postman
 
@@ -303,6 +304,8 @@ La colección contiene variables para la URL base, token e identificadores de pr
 ## 🎥 Video explicativo
 
 **Video de la cuarta entrega:** [Ver en YouTube](https://youtu.be/QZNCGFliHQc)
+
+El recorrido utilizado para la demostración está documentado en `GUION_VIDEO.md`.
 
 ## Roadmap - Futuras mejoras
 
