@@ -1,18 +1,13 @@
-
-// Barra de navegación utilizada en las distintas páginas de Busticaria.
-
-// Buscamos el elemento HTML donde vamos a colocar el navbar.
+// El menú se genera una vez y se adapta a la ruta y al estado de autenticación.
 const navbar = document.getElementById("navbar");
 
-// Consultamos si existe un usuario con sesión iniciada.
-// Este dato se guarda en sessionStorage al hacer login.
 const usuarioLogueado = sessionStorage.getItem("usuarioLogueado");
+const tokenBusticaria = sessionStorage.getItem("tokenBusticaria");
 
-// Las páginas están ubicadas en distintas carpetas.
-// Por eso necesitamos ajustar las rutas para que los enlaces funcionen.
 let basePath = "";
 let logoPath = "../assets/img/logo.webp";
 
+// Las páginas anidadas requieren prefijos relativos diferentes.
 if (window.location.pathname.includes("/pages/auth/")) {
     basePath = "../../";
     logoPath = "../../../assets/img/logo.webp";
@@ -26,13 +21,10 @@ if (window.location.pathname.includes("/pages/auth/")) {
     logoPath = "../../assets/img/logo.webp";
 }
 
-// En esta variable vamos armando los enlaces que se muestran en el menú.
 let linksNavbar = "";
 
-// Obtenemos la dirección de la página que está abierta.
 const paginaActual = window.location.pathname;
 
-// Si estamos en el login, mostramos el enlace para registrarse.
 if (paginaActual.includes("/auth/login/")) {
 
     linksNavbar = `
@@ -43,7 +35,6 @@ if (paginaActual.includes("/auth/login/")) {
         </li>
     `;
 
-// Si estamos en el registro, mostramos el enlace para iniciar sesión.
 } else if (paginaActual.includes("/auth/signin/")) {
 
     linksNavbar = `
@@ -56,7 +47,6 @@ if (paginaActual.includes("/auth/login/")) {
 
 } else {
 
-    // En las demás páginas mostramos la navegación principal.
     linksNavbar = `
         <li class="nav-item">
             <a class="nav-link" href="${basePath}home.html">Home</a>
@@ -75,9 +65,8 @@ if (paginaActual.includes("/auth/login/")) {
         </li>
     `;
 
-    // Si hay un usuario logueado habilitamos el enlace al carrito
-    // y el botón para cerrar sesión.
-    if (usuarioLogueado) {
+    // El carrito sólo se expone cuando existen usuario público y token.
+    if (usuarioLogueado && tokenBusticaria) {
 
         linksNavbar += `
             <li class="nav-item">
@@ -117,7 +106,6 @@ if (paginaActual.includes("/auth/login/")) {
 
     } else {
 
-        // Si no hay sesión iniciada mostramos la opción de login.
         linksNavbar += `
             <li class="nav-item">
                 <a class="nav-link" href="${basePath}auth/login/login.html">
@@ -128,8 +116,7 @@ if (paginaActual.includes("/auth/login/")) {
     }
 }
 
-// Insertamos el HTML del navbar dentro de la página actual.
-// Bootstrap se encarga del diseño responsive.
+// Bootstrap controla el comportamiento responsive del marcado generado.
 navbar.innerHTML = `
     <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top">
         <div class="container-fluid">
@@ -155,18 +142,16 @@ navbar.innerHTML = `
     </nav>
 `;
 
-// Buscamos el botón de cerrar sesión.
-// Solamente va a existir cuando haya un usuario logueado.
 const btnLogout = document.getElementById("btnLogout");
 
 if (btnLogout) {
 
     btnLogout.addEventListener("click", function () {
 
-        // Eliminamos los datos de sesión del usuario actual.
+        // La sesión se limita a la pestaña actual.
         sessionStorage.removeItem("usuarioLogueado");
+        sessionStorage.removeItem("tokenBusticaria");
 
-        // Después lo redirigimos a la página de login.
         window.location.href = `${basePath}auth/login/login.html`;
     });
 }

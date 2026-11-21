@@ -1,214 +1,189 @@
+import { obtenerBaseDatos, obtenerClienteMongo } from '../config/mongodb.mjs';
+import { siguienteId } from '../services/contadores.mjs';
+import { ErrorHTTP } from '../utils/ErrorHTTP.mjs';
 
-import { fileURLToPath } from 'node:url';
-import { leerJSON, guardarJSON } from '../../data/archivos.mjs';
+function fechaArgentina() {
+    // La fecha comercial se registra en la zona horaria definida para el proyecto.
+    return new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'America/Argentina/Buenos_Aires',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+    }).format(new Date());
+}
 
-const archivoVentas = fileURLToPath(
-    new URL('../../data/ventas.json', import.meta.url)
-);
-
-const archivoProductos = fileURLToPath(
-    new URL('../../data/productos.json', import.meta.url)
-);
-
-const archivoUsuarios = fileURLToPath(
-    new URL('../../data/usuarios.json', import.meta.url)
-);
-
-// GET /api/ventas
 export async function listarVentas(req, res) {
     try {
-        const ventas = await leerJSON(archivoVentas);
+        const ventas = await obtenerBaseDatos()
+            .collection('ventas')
+            .find({}, { projection: { _id: 0 } })
+            .sort({ id: 1 })
+            .toArray();
 
         return res.status(200).json(ventas);
-
     } catch (error) {
-        console.error('Error al consultar ventas:', error);
-
-        return res.status(500).json({
-            mensaje: 'Error al consultar las ventas'
-        });
+        console.error('Error al consultar ventas:', error.message);
+        return res.status(500).json({ mensaje: 'Error al consultar las ventas' });
     }
 }
 
-// Cola para procesar las compras de forma secuencial
-let colaCompras = Promise.resolve();
+// Rechaza productos duplicados para que cada descuento de stock sea inequívoco.
+function validarSolicitud(direccion, productos) {
+    if (
+        typeof direccion !== 'string' ||
+        direccion.trim().length < 5 ||
+        direccion.trim().length > 200 ||
+        !Array.isArray(productos) ||
+        productos.length === 0
+    ) {
+        throw new ErrorHTTP(400, 'La dirección o los productos son incorrectos');
+    }
 
-// POST /api/ventas
-export function crearVenta(req, res) {
-    const proceso = colaCompras.then(
-        () => registrarCompra(req, res)
-    );
+    const ids = new Set();
 
-    colaCompras = proceso.catch(error => {
-        console.error('Error en la cola de compras:', error);
-
-        if (!res.headersSent) {
-            res.status(500).json({
-                mensaje: 'Error interno al registrar la compra'
-            });
+    for (const item of productos) {
+        if (
+            !item ||
+            !Number.isInteger(item.id_producto) || item.id_producto <= 0 ||
+            !Number.isInteger(item.cantidad) || item.cantidad <= 0 ||
+            ids.has(item.id_producto)
+        ) {
+            throw new ErrorHTTP(
+                400,
+                'Los productos o cantidades son incorrectos o están repetidos'
+            );
         }
-    });
+
+        ids.add(item.id_producto);
+    }
 }
 
-// Registrar compra y descontar stock
-async function registrarCompra(req, res) {
+// POST /api/ventas
+export async function crearVenta(req, res) {
+    // La identidad autorizada proviene del JWT, no del cuerpo de la solicitud.
+    const idUsuario = req.autenticacion.idUsuario;
+    const { id_usuario: idEnviado, direccion, productos } = req.body ?? {};
+
     try {
-        const {
-            id_usuario,
-            direccion,
-            productos
-        } = req.body ?? {};
+        validarSolicitud(direccion, productos);
 
-        // Validar usuario, dirección y listado
-        if (
-            !Number.isInteger(id_usuario) ||
-            id_usuario <= 0 ||
-            typeof direccion !== 'string' ||
-            direccion.trim().length < 5 ||
-            direccion.trim().length > 200 ||
-            !Array.isArray(productos) ||
-            productos.length === 0
-        ) {
-            return res.status(400).json({
-                mensaje: 'Usuario, dirección o productos incorrectos'
-            });
+        if (idEnviado !== undefined && Number(idEnviado) !== idUsuario) {
+            throw new ErrorHTTP(403, 'No podés registrar una compra para otro usuario');
         }
 
-        // Validar productos y cantidades
-        const ids = new Set();
+        const db = obtenerBaseDatos();
+        const sesion = obtenerClienteMongo().startSession();
+        let nuevaVenta;
 
-        for (const item of productos) {
-            if (
-                !item ||
-                !Number.isInteger(item.id_producto) ||
-                item.id_producto <= 0 ||
-                !Number.isInteger(item.cantidad) ||
-                item.cantidad <= 0 ||
-                ids.has(item.id_producto)
-            ) {
-                return res.status(400).json({
-                    mensaje: 'Los productos o cantidades son incorrectos o están repetidos'
-                });
-            }
-
-            ids.add(item.id_producto);
-        }
-
-        // Comprobar que el usuario exista y esté activo
-        const usuarios = await leerJSON(archivoUsuarios);
-
-        const usuario = usuarios.find(
-            u => u.id === id_usuario
-        );
-
-        if (!usuario || usuario.activo !== true) {
-            return res.status(403).json({
-                mensaje: 'El usuario no existe o está inactivo'
-            });
-        }
-
-        // Obtener productos y ventas actuales
-        const catalogo = await leerJSON(archivoProductos);
-        const ventas = await leerJSON(archivoVentas);
-
-        const catalogoActualizado = structuredClone(catalogo);
-
-        let total = 0;
-
-        // Revisar productos y descontar stock
-        for (const item of productos) {
-            const producto = catalogoActualizado.find(
-                p => p.id === item.id_producto
-            );
-
-            if (!producto) {
-                return res.status(404).json({
-                    mensaje: `No existe el producto ${item.id_producto}`
-                });
-            }
-
-            if (
-                producto.disponible !== true ||
-                producto.stock < item.cantidad
-            ) {
-                return res.status(409).json({
-                    mensaje: `Stock insuficiente de ${producto.nombre}`
-                });
-            }
-
-            if (
-                typeof producto.precio !== 'number' ||
-                !Number.isFinite(producto.precio) ||
-                producto.precio <= 0
-            ) {
-                return res.status(500).json({
-                    mensaje: 'El precio del producto es inválido'
-                });
-            }
-
-            // El precio se obtiene del servidor
-            total += producto.precio * item.cantidad;
-
-            producto.stock -= item.cantidad;
-            producto.disponible = producto.stock > 0;
-        }
-
-        if (!Number.isFinite(total) || total <= 0) {
-            return res.status(400).json({
-                mensaje: 'El total de la compra es inválido'
-            });
-        }
-
-        // Crear nueva venta
-        const nuevaVenta = {
-            id: Math.max(0, ...ventas.map(v => v.id)) + 1,
-            id_usuario: id_usuario,
-            fecha: new Date().toISOString().slice(0, 10),
-            total: total,
-            direccion: direccion.trim(),
-            pagada: false,
-            productos: productos.map(item => ({
-                id_producto: item.id_producto,
-                cantidad: item.cantidad
-            }))
-        };
-
-        // Guardar stock actualizado
-        await guardarJSON(
-            archivoProductos,
-            catalogoActualizado
-        );
-
-        // Registrar venta
         try {
-            await guardarJSON(
-                archivoVentas,
-                [...ventas, nuevaVenta]
-            );
-        } catch (error) {
-            // Intentar restaurar stock si falla la venta
-            try {
-                await guardarJSON(archivoProductos, catalogo);
-            } catch (errorRestauracion) {
-                console.error(
-                    'No se pudo restaurar el stock:',
-                    errorRestauracion
+            // El descuento de stock y el alta de la venta forman una sola operación atómica.
+            await sesion.withTransaction(async () => {
+                const usuario = await db.collection('usuarios').findOne(
+                    { id: idUsuario, activo: true },
+                    { session: sesion, projection: { _id: 1 } }
                 );
-            }
 
-            throw error;
+                if (!usuario) {
+                    throw new ErrorHTTP(403, 'El usuario no existe o está inactivo');
+                }
+
+                let total = 0;
+
+                for (const item of productos) {
+                    // El filtro de stock dentro de la actualización impide sobreventas concurrentes.
+                    const producto = await db.collection('productos').findOneAndUpdate(
+                        {
+                            id: item.id_producto,
+                            disponible: true,
+                            stock: { $gte: item.cantidad },
+                            precio: { $type: 'number', $gt: 0 }
+                        },
+                        [
+                            { $set: { stock: { $subtract: ['$stock', item.cantidad] } } },
+                            { $set: { disponible: { $gt: ['$stock', 0] } } }
+                        ],
+                        { session: sesion, returnDocument: 'after' }
+                    );
+
+                    if (!producto) {
+                        const existente = await db.collection('productos').findOne(
+                            { id: item.id_producto },
+                            { session: sesion, projection: { _id: 0 } }
+                        );
+
+                        if (!existente) {
+                            throw new ErrorHTTP(
+                                404,
+                                `No existe el producto ${item.id_producto}`
+                            );
+                        }
+
+                        if (
+                            typeof existente.precio !== 'number' ||
+                            !Number.isFinite(existente.precio) ||
+                            existente.precio <= 0
+                        ) {
+                            throw new ErrorHTTP(500, 'El precio del producto es inválido');
+                        }
+
+                        throw new ErrorHTTP(
+                            409,
+                            `Stock insuficiente de ${existente.nombre}`
+                        );
+                    }
+
+                    // El total se calcula con el precio persistido, sin confiar en el cliente.
+                    total += producto.precio * item.cantidad;
+                }
+
+                if (!Number.isFinite(total) || total <= 0) {
+                    throw new ErrorHTTP(400, 'El total de la compra es inválido');
+                }
+
+                nuevaVenta = {
+                    id: await siguienteId('ventas', { session: sesion }),
+                    id_usuario: idUsuario,
+                    fecha: fechaArgentina(),
+                    total,
+                    direccion: direccion.trim(),
+                    pagada: false,
+                    productos: productos.map(item => ({
+                        id_producto: item.id_producto,
+                        cantidad: item.cantidad
+                    }))
+                };
+
+                await db.collection('ventas').insertOne(nuevaVenta, { session: sesion });
+            }, {
+                readConcern: { level: 'snapshot' },
+                writeConcern: { w: 'majority' },
+                maxCommitTimeMS: 10000
+            });
+        } finally {
+            await sesion.endSession();
         }
 
         return res.status(201).json({
             mensaje: 'Orden de compra registrada correctamente',
             venta: nuevaVenta
         });
-
     } catch (error) {
-        console.error('Error al registrar la compra:', error);
+        if (error instanceof ErrorHTTP) {
+            return res.status(error.estado).json({ mensaje: error.message });
+        }
 
-        return res.status(500).json({
-            mensaje: 'Error interno al registrar la compra'
-        });
+        console.error('Error al registrar compra:', error.message);
+
+        if (
+            error.code === 20 ||
+            error.codeName === 'IllegalOperation' ||
+            /Transaction numbers are only allowed/i.test(error.message)
+        ) {
+            return res.status(503).json({
+                mensaje: 'La base de datos no permite garantizar una compra atómica'
+            });
+        }
+
+        return res.status(500).json({ mensaje: 'Error interno al registrar la compra' });
     }
 }

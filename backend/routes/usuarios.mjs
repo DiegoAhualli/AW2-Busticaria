@@ -9,13 +9,13 @@ import {
 
 const router = express.Router();
 
-// POST - Iniciar sesión
+// Autenticación y emisión del JWT.
 router.post('/login', iniciarSesion);
 
-// POST - Registrar un usuario nuevo
+// Registro de una cuenta nueva.
 router.post('/', registrarUsuario);
 
-// DELETE - Eliminar un usuario existente
+// Baja condicionada por las ventas relacionadas.
 router.delete('/:id', eliminarUsuario);
 
 export default router;

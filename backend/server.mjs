@@ -1,50 +1,85 @@
-/**
- * Servidor principal de Busticaria (AW2).
- * Desde acá levantamos Express, conectamos las rutas de la API
- * y servimos las páginas del frontend.
- */
 import express from 'express';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+    cerrarMongoDB,
+    comprobarSoporteTransacciones,
+    conectarMongoDB,
+    crearIndices
+} from './config/mongodb.mjs';
+import { obtenerJwtSecret, obtenerPuerto } from './config/entorno.mjs';
 
-// Cada recurso tiene sus rutas separadas para mantener el proyecto ordenado.
 import productosRouter from './routes/productos.mjs';
 import usuariosRouter from './routes/usuarios.mjs';
 import ventasRouter from './routes/ventas.mjs';
 
 const app = express();
-const PORT = 3000;
 
-// Calculamos dónde está el frontend tomando como referencia este archivo.
-// Así no necesitamos escribir una ruta fija de nuestra computadora.
+// La ruta se resuelve desde este módulo para evitar dependencias del directorio de ejecución.
 const directorioBackend = path.dirname(fileURLToPath(import.meta.url));
 const directorioFrontend = path.resolve(directorioBackend, '../frontend');
 
-// Permite recibir datos JSON enviados desde fetch o Postman.
-app.use(express.json());
+app.use(express.json({ limit: '100kb' }));
 
-// Rutas que exponen los recursos del sistema.
-// Express deriva cada solicitud al archivo que le corresponde.
 app.use('/api/productos', productosRouter);
 app.use('/api/usuarios', usuariosRouter);
 app.use('/api/ventas', ventasRouter);
 
-// Cuando entramos a la raíz, abrimos directamente la página principal.
 app.get('/', (req, res) => {
     res.redirect('/pages/home.html');
 });
 
-// Express también entrega HTML, CSS, imágenes y JS del frontend.
-// Como la página y la API usan el mismo origen, no necesitamos configurar CORS.
+// El frontend y la API comparten origen; no se requiere configuración CORS.
 app.use(express.static(directorioFrontend));
 
-// Si una solicitud no coincide con ninguna ruta anterior, devolvemos 404.
 app.use((req, res) => {
     res.status(404).json({ mensaje: 'Ruta no encontrada' });
 });
 
-// Iniciamos el servidor y mostramos las URLs principales en consola.
-app.listen(PORT, () => {
-    console.log(`Busticaria: http://localhost:${PORT}/pages/home.html`);
-    console.log(`API productos: http://localhost:${PORT}/api/productos`);
-});
+let servidor;
+
+async function iniciarServidor() {
+    try {
+        // La configuración se valida antes de aceptar solicitudes.
+        obtenerJwtSecret();
+        const puerto = obtenerPuerto();
+
+        await conectarMongoDB();
+        await crearIndices();
+
+        // Sin transacciones no puede garantizarse la consistencia entre venta y stock.
+        const admiteTransacciones = await comprobarSoporteTransacciones();
+
+        if (!admiteTransacciones) {
+            throw new Error(
+                'La instancia de MongoDB no admite las transacciones requeridas para las compras'
+            );
+        }
+
+        servidor = app.listen(puerto, () => {
+            console.log(`Busticaria: http://localhost:${puerto}/pages/home.html`);
+            console.log(`API productos: http://localhost:${puerto}/api/productos`);
+            console.log('MongoDB conectado a la base busticaria');
+        });
+    } catch (error) {
+        console.error(`No se pudo iniciar Busticaria: ${error.message}`);
+        await cerrarMongoDB();
+        process.exitCode = 1;
+    }
+}
+
+async function cerrarServidor(senal) {
+    console.log(`Cerrando Busticaria (${senal})...`);
+
+    if (servidor) {
+        await new Promise(resolve => servidor.close(resolve));
+    }
+
+    await cerrarMongoDB();
+    process.exit(0);
+}
+
+process.once('SIGINT', () => cerrarServidor('SIGINT'));
+process.once('SIGTERM', () => cerrarServidor('SIGTERM'));
+
+await iniciarServidor();

@@ -3,8 +3,10 @@ import express from 'express';
 
 import {
     listarProductos,
+    obtenerProducto,
     agregarProducto,
-    actualizarStock
+    actualizarStock,
+    eliminarProducto
 } from '../controllers/productos.controller.mjs';
 
 import {
@@ -14,13 +16,19 @@ import {
 
 const router = express.Router();
 
-// GET - Obtener todos los productos
+// Lectura del catálogo completo.
 router.get('/', listarProductos);
 
-// POST - Registrar un producto nuevo
+// Lectura individual por identificador numérico.
+router.get('/:id', obtenerProducto);
+
+// Alta con validación previa del cuerpo.
 router.post('/', validarNuevoProducto, agregarProducto);
 
-// PUT - Actualizar el stock de un producto
+// Actualización parcial del stock.
 router.put('/:id', validarStock, actualizarStock);
+
+// Baja condicionada por las ventas relacionadas.
+router.delete('/:id', eliminarProducto);
 
 export default router;

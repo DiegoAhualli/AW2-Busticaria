@@ -1,13 +1,12 @@
 
 (function () {
 
-    // Elementos HTML utilizados para mostrar el carrito y realizar la compra.
     const contenedorCarrito = document.getElementById('contenedorCarrito');
     const btnRealizarCompra = document.getElementById('btnRealizarCompra');
     const btnVolverComprar = document.getElementById('btnVolverComprar');
     const inputDireccion = document.getElementById('txtDireccionEnvio');
 
-    // Recuperamos los productos que el usuario fue agregando.
+    // Tolera datos antiguos o dañados en localStorage.
     function obtenerCarritoGuardado() {
         try {
             const valor = JSON.parse(localStorage.getItem('carrito'));
@@ -19,14 +18,13 @@
 
     let carrito = obtenerCarritoGuardado();
 
-    // Acá guardamos el catálogo del servidor para consultar el stock.
+    // Copia del catálogo usada para validar aumentos de cantidad.
     let productosServidor = [];
 
-    // Esta variable evita que el usuario registre dos veces la misma compra
-    // presionando repetidamente el botón.
+    // Bloquea envíos repetidos mientras la compra está pendiente.
     let compraEnProceso = false;
 
-    // Evitamos insertar caracteres especiales directamente dentro del HTML.
+    // Evita insertar contenido sin escapar en las tarjetas del carrito.
     function escaparTexto(texto) {
         return String(texto ?? '').replace(/[&<>"']/g, function (caracter) {
             return {
@@ -39,9 +37,7 @@
         });
     }
 
-    // Convertimos el precio en un número.
-    // También contemplamos el formato anterior del carrito de AW1,
-    // donde algunos precios podían estar guardados como texto.
+    // Admite el formato textual utilizado por versiones anteriores del carrito.
     function obtenerPrecioNumerico(precio) {
         if (typeof precio === 'number') {
             return Number.isFinite(precio) ? precio : 0;
@@ -62,20 +58,16 @@
         return Number.isFinite(numero) && numero >= 0 ? numero : 0;
     }
 
-    // Formateamos los importes para mostrarlos en pesos argentinos.
     function formatearPesos(numero) {
         return Number(numero).toLocaleString('es-AR');
     }
 
-    // Guardamos los cambios del carrito en el navegador.
     function guardarCarrito() {
         localStorage.setItem('carrito', JSON.stringify(carrito));
     }
 
-    // Generamos el HTML de los productos agregados al carrito.
     function mostrarCarrito() {
 
-        // Si está vacío mostramos un mensaje y deshabilitamos la compra.
         if (carrito.length === 0) {
             contenedorCarrito.innerHTML =
                 '<p class="alert alert-warning">No hay productos en el carrito.</p>';
@@ -86,7 +78,6 @@
 
         btnRealizarCompra.disabled = compraEnProceso;
 
-        // Recorremos el carrito y creamos una tarjeta por cada producto.
         contenedorCarrito.innerHTML = carrito.map(function (producto, indice) {
 
             const cantidad = Number(producto.cantidad);
@@ -110,7 +101,6 @@
 
                             <p class="small">Subtotal: $${formatearPesos(subtotal)}</p>
 
-                            <!-- Botones para modificar la cantidad del producto -->
                             <div class="d-flex align-items-center gap-2 mb-3">
                                 <button class="btn btn-outline-secondary btn-restar-carrito"
                                         data-indice="${indice}" type="button">-</button>
@@ -132,9 +122,7 @@
             `;
         }).join('');
 
-        // Sumamos los subtotales para mostrar un total estimado.
-        // El total definitivo lo calcula Express al registrar la venta,
-        // utilizando los precios de productos.json.
+        // Es sólo una referencia visual; el backend recalcula el total definitivo.
         const totalEstimado = carrito.reduce(function (acumulado, producto) {
             return acumulado +
                 obtenerPrecioNumerico(producto.precio) * Number(producto.cantidad);
@@ -147,10 +135,9 @@
         contenedorCarrito.appendChild(resumen);
     }
 
-    // Manejamos los botones para sumar, restar o eliminar productos.
+    // Un listener delegado controla altas, bajas y eliminación de productos.
     contenedorCarrito.addEventListener('click', function (evento) {
 
-        // No permitimos modificar el carrito mientras se registra una compra.
         if (compraEnProceso) return;
 
         const boton = evento.target.closest('button[data-indice]');
@@ -162,11 +149,9 @@
 
         if (!producto) return;
 
-        // Eliminar directamente el producto del carrito.
         if (boton.classList.contains('btn-eliminar-producto')) {
             carrito.splice(indice, 1);
 
-        // Restar una unidad o eliminar el producto si solamente quedaba una.
         } else if (boton.classList.contains('btn-restar-carrito')) {
 
             if (Number(producto.cantidad) > 1) {
@@ -175,7 +160,6 @@
                 carrito.splice(indice, 1);
             }
 
-        // Sumar una unidad verificando antes el stock del servidor.
         } else if (boton.classList.contains('btn-sumar-carrito')) {
 
             const registro = productosServidor.find(function (item) {
@@ -196,13 +180,10 @@
             return;
         }
 
-        // Guardamos los cambios y volvemos a mostrar el carrito actualizado.
         guardarCarrito();
         mostrarCarrito();
     });
 
-    // BOTÓN REALIZAR COMPRA
-    // Este evento conecta el carrito con la ruta POST /api/ventas.
     btnRealizarCompra.addEventListener('click', async function () {
 
         if (compraEnProceso) return;
@@ -212,8 +193,9 @@
             return;
         }
 
-        // Recuperamos los datos del usuario que inició sesión.
+        // La autorización real de la compra depende del JWT.
         let usuario;
+        const token = sessionStorage.getItem('tokenBusticaria');
 
         try {
             usuario = JSON.parse(sessionStorage.getItem('usuarioLogueado'));
@@ -221,17 +203,16 @@
             usuario = null;
         }
 
-        // Necesitamos un ID válido para asociar la venta con usuarios.json.
         if (!usuario ||
             !Number.isInteger(Number(usuario.id)) ||
-            Number(usuario.id) <= 0) {
+            Number(usuario.id) <= 0 ||
+            typeof token !== 'string' || !token) {
 
             alert('Iniciá sesión para realizar la compra');
             window.location.href = '/pages/auth/login/login.html';
             return;
         }
 
-        // Validamos la dirección de entrega.
         const direccion = inputDireccion.value.trim();
 
         if (direccion.length < 5 || direccion.length > 200) {
@@ -240,8 +221,7 @@
             return;
         }
 
-        // Preparamos los productos con la estructura utilizada en ventas.json.
-        // Enviamos solamente el ID y la cantidad, no los precios del carrito.
+        // El cliente envía identificadores y cantidades; nunca envía precios confiables.
         const detalles = carrito.map(function (item) {
             return {
                 id_producto: Number(item.id),
@@ -249,8 +229,6 @@
             };
         });
 
-        // Validamos que todos los productos tengan identificadores y cantidades
-        // correctas antes de enviarlos al backend.
         if (
             detalles.some(function (item) {
                 return !Number.isInteger(item.id_producto) ||
@@ -264,8 +242,6 @@
             return;
         }
 
-        // Pedimos confirmación antes de registrar la orden.
-        // El pago queda pendiente porque no incorporamos una pasarela de pago.
         if (!confirm('¿Confirmás el registro de la orden de compra? El pago quedará pendiente.')) {
             return;
         }
@@ -276,12 +252,13 @@
 
         try {
 
-            // Enviamos la orden a Express utilizando POST y un cuerpo JSON.
             const respuesta = await fetch('/api/ventas', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify({
-                    id_usuario: Number(usuario.id),
                     direccion,
                     productos: detalles
                 })
@@ -289,14 +266,20 @@
 
             const datos = await respuesta.json();
 
-            // Si Express rechaza la operación, mantenemos el carrito.
             if (!respuesta.ok) {
+                if (respuesta.status === 401) {
+                    sessionStorage.removeItem('usuarioLogueado');
+                    sessionStorage.removeItem('tokenBusticaria');
+                    alert(datos.mensaje || 'La sesión venció. Iniciá sesión nuevamente.');
+                    window.location.href = '/pages/auth/login/login.html';
+                    return;
+                }
+
                 alert(datos.mensaje || 'No se pudo registrar la compra');
                 return;
             }
 
-            // Solamente vaciamos el carrito si el servidor confirmó la compra.
-            // La venta ya queda registrada en ventas.json y se actualiza el stock.
+            // El carrito se vacía sólo después de la confirmación del servidor.
             localStorage.removeItem('carrito');
             carrito = [];
 
@@ -309,26 +292,22 @@
 
         } catch (error) {
 
-            // Si no podemos conectarnos con el backend, conservamos el carrito.
             console.error('Error al registrar la compra:', error);
             alert('No se pudo conectar con el servidor. El carrito se conserva.');
 
         } finally {
 
-            // Restauramos el botón cuando finaliza el intento de compra.
             compraEnProceso = false;
             btnRealizarCompra.textContent = 'Realizar compra';
             btnRealizarCompra.disabled = carrito.length === 0;
         }
     });
 
-    // Regresamos al catálogo principal para seguir seleccionando productos.
     btnVolverComprar.addEventListener('click', function () {
         window.location.href = '/pages/home.html';
     });
 
-    // Consultamos el catálogo al abrir el carrito.
-    // Lo utilizamos para validar los aumentos de cantidad.
+    // Actualiza el stock de referencia antes de habilitar modificaciones.
     async function iniciarCarrito() {
         try {
             const respuesta = await fetch('/api/productos');

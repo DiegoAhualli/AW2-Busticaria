@@ -5,13 +5,14 @@ import {
     listarVentas,
     crearVenta
 } from '../controllers/ventas.controller.mjs';
+import { autenticarJWT } from '../middleware/autenticarJWT.mjs';
 
 const router = express.Router();
 
-// Consultar las ventas registradas
+// Consulta del historial persistido.
 router.get('/', listarVentas);
 
-// Registrar una orden de compra
-router.post('/', crearVenta);
+// El middleware verifica el JWT antes de registrar la compra.
+router.post('/', autenticarJWT, crearVenta);
 
 export default router;

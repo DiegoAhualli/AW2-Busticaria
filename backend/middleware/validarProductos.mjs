@@ -1,5 +1,4 @@
-
-// Validar los datos antes de registrar un producto
+// Valida el cuerpo antes de delegar el alta al controlador.
 export function validarNuevoProducto(req, res, next) {
 
     const { nombre, descripcion, categoria, precio, stock, imagen } = req.body ?? {};
@@ -20,7 +19,7 @@ export function validarNuevoProducto(req, res, next) {
     next();
 }
 
-// Validar ID y stock antes de actualizar
+// La actualización admite stock cero, que marca el producto como no disponible.
 export function validarStock(req, res, next) {
 
     const id = Number(req.params.id);

@@ -1,0 +1,259 @@
+{
+  "info": {
+    "_postman_id": "0a26efb8-32db-4ef1-b17e-busticaria2026",
+    "name": "Busticaria - Cuarta entrega",
+    "description": "Pruebas ordenadas de CRUD, Bcrypt, JWT y compras sobre MongoDB. Ejecutar desde el inicio y usar solamente datos ficticios.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "if (!pm.collectionVariables.get('marcaPrueba')) {",
+          "  const marca = Date.now().toString();",
+          "  pm.collectionVariables.set('marcaPrueba', marca);",
+          "  pm.collectionVariables.set('emailPrueba', `postman-${marca}@busticaria.test`);",
+          "}"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Consultas",
+      "item": [
+        {
+          "name": "GET productos",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/productos"
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": ["pm.test('HTTP 200 y arreglo', () => { pm.response.to.have.status(200); pm.expect(pm.response.json()).to.be.an('array'); });"] }
+          }]
+        },
+        {
+          "name": "GET ventas",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/ventas"
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": ["pm.test('HTTP 200 y arreglo', () => { pm.response.to.have.status(200); pm.expect(pm.response.json()).to.be.an('array'); });"] }
+          }]
+        }
+      ]
+    },
+    {
+      "name": "2. Productos CRUD",
+      "item": [
+        {
+          "name": "CREATE - POST producto",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Producto CRUD {{marcaPrueba}}\",\n  \"descripcion\": \"Producto ficticio para la demostración\",\n  \"categoria\": \"tecnologia\",\n  \"precio\": 1500,\n  \"stock\": 5,\n  \"imagen\": \"logo.webp\"\n}"
+            },
+            "url": "{{baseUrl}}/api/productos"
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": ["pm.test('Producto creado', () => pm.response.to.have.status(201));", "pm.collectionVariables.set('productoId', pm.response.json().producto.id);"] }
+          }]
+        },
+        {
+          "name": "READ - GET producto por ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/productos/{{productoId}}"
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": ["pm.test('Producto encontrado', () => { pm.response.to.have.status(200); pm.expect(pm.response.json().id).to.eql(Number(pm.collectionVariables.get('productoId'))); });"] }
+          }]
+        },
+        {
+          "name": "UPDATE - PUT stock",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"stock\": 8\n}" },
+            "url": "{{baseUrl}}/api/productos/{{productoId}}"
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": ["pm.test('Stock actualizado', () => { pm.response.to.have.status(200); pm.expect(pm.response.json().producto.stock).to.eql(8); });"] }
+          }]
+        },
+        {
+          "name": "DELETE - producto",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/productos/{{productoId}}"
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": ["pm.test('Producto eliminado', () => pm.response.to.have.status(200));"] }
+          }]
+        }
+      ]
+    },
+    {
+      "name": "3. Usuarios y autenticación",
+      "item": [
+        {
+          "name": "POST registrar usuario",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Usuario\",\n  \"apellido\": \"Postman\",\n  \"email\": \"{{emailPrueba}}\",\n  \"password\": \"{{passwordPrueba}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/usuarios"
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": ["pm.test('Usuario creado sin exponer contraseña', () => { pm.response.to.have.status(201); pm.expect(pm.response.json().usuario).not.to.have.property('password'); });", "pm.collectionVariables.set('usuarioId', pm.response.json().usuario.id);"] }
+          }]
+        },
+        {
+          "name": "POST login incorrecto",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{emailPrueba}}\",\n  \"password\": \"ClaveIncorrecta2026!\"\n}" },
+            "url": "{{baseUrl}}/api/usuarios/login"
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": ["pm.test('Credenciales rechazadas', () => pm.response.to.have.status(401));"] }
+          }]
+        },
+        {
+          "name": "POST login correcto",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{emailPrueba}}\",\n  \"password\": \"{{passwordPrueba}}\"\n}" },
+            "url": "{{baseUrl}}/api/usuarios/login"
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": ["pm.test('Login emite JWT', () => { pm.response.to.have.status(200); pm.expect(pm.response.json().token).to.be.a('string'); });", "pm.collectionVariables.set('token', pm.response.json().token);"] }
+          }]
+        }
+      ]
+    },
+    {
+      "name": "4. Seguridad JWT y compras",
+      "item": [
+        {
+          "name": "Preparar producto de compra",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Producto compra {{marcaPrueba}}\",\n  \"descripcion\": \"Producto ficticio para probar stock y ventas\",\n  \"categoria\": \"hogar\",\n  \"precio\": 1250,\n  \"stock\": 2,\n  \"imagen\": \"logo.webp\"\n}"
+            },
+            "url": "{{baseUrl}}/api/productos"
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": ["pm.test('Producto de compra creado', () => pm.response.to.have.status(201));", "pm.collectionVariables.set('productoCompraId', pm.response.json().producto.id);"] }
+          }]
+        },
+        {
+          "name": "POST compra sin token",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"direccion\": \"Calle Ficticia 123\",\n  \"productos\": [{ \"id_producto\": {{productoCompraId}}, \"cantidad\": 1 }]\n}" },
+            "url": "{{baseUrl}}/api/ventas"
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": ["pm.test('Sin token devuelve 401', () => pm.response.to.have.status(401));"] }
+          }]
+        },
+        {
+          "name": "POST compra con token inválido",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer token.invalido.firma" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"direccion\": \"Calle Ficticia 123\",\n  \"productos\": [{ \"id_producto\": {{productoCompraId}}, \"cantidad\": 1 }]\n}" },
+            "url": "{{baseUrl}}/api/ventas"
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": ["pm.test('Token inválido devuelve 401', () => pm.response.to.have.status(401));"] }
+          }]
+        },
+        {
+          "name": "POST compra con stock insuficiente",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"direccion\": \"Calle Ficticia 123\",\n  \"productos\": [{ \"id_producto\": {{productoCompraId}}, \"cantidad\": 3 }]\n}" },
+            "url": "{{baseUrl}}/api/ventas"
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": ["pm.test('Stock insuficiente devuelve 409', () => pm.response.to.have.status(409));"] }
+          }]
+        },
+        {
+          "name": "POST compra autenticada",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"direccion\": \"Calle Ficticia 123\",\n  \"productos\": [{ \"id_producto\": {{productoCompraId}}, \"cantidad\": 1 }]\n}" },
+            "url": "{{baseUrl}}/api/ventas"
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": ["pm.test('Compra registrada con identidad JWT', () => { pm.response.to.have.status(201); pm.expect(pm.response.json().venta.id_usuario).to.eql(Number(pm.collectionVariables.get('usuarioId'))); });", "pm.collectionVariables.set('ventaId', pm.response.json().venta.id);"] }
+          }]
+        },
+        {
+          "name": "GET verificar stock descontado",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/productos/{{productoCompraId}}"
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": ["pm.test('Stock quedó en 1', () => { pm.response.to.have.status(200); pm.expect(pm.response.json().stock).to.eql(1); });"] }
+          }]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "marcaPrueba", "value": "" },
+    { "key": "emailPrueba", "value": "" },
+    { "key": "passwordPrueba", "value": "ClavePostman2026!" },
+    { "key": "usuarioId", "value": "" },
+    { "key": "productoId", "value": "" },
+    { "key": "productoCompraId", "value": "" },
+    { "key": "ventaId", "value": "" },
+    { "key": "token", "value": "" }
+  ]
+}
