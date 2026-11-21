@@ -37,9 +37,6 @@
                 return;
             }
 
-            // Elimina el formato de registro local usado por la versión anterior.
-            localStorage.removeItem('usuarioRegistrado');
-
             alert('Usuario registrado correctamente. Iniciá sesión para continuar.');
 
             window.location.href = '/pages/auth/login/login.html';

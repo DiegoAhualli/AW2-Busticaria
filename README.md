@@ -85,7 +85,6 @@ AW2-Busticaria/
 │   ├── package.json
 │   └── server.mjs
 ├── data/
-│   ├── archivos.mjs
 │   ├── productos.json
 │   ├── usuarios.json
 │   └── ventas.json
@@ -99,6 +98,7 @@ AW2-Busticaria/
 │   └── Busticaria-Entrega-4.postman_collection.json
 ├── .env.example
 ├── ENTREGA_FINAL.md
+├── GUION_VIDEO.md
 ├── INFORME_PRUEBAS.md
 └── README.md
 ```
@@ -305,7 +305,7 @@ La colección contiene variables para la URL base, token e identificadores de pr
 
 **Enlace definitivo del video:** PENDIENTE DE INCORPORAR
 
-El enlace debe reemplazarse después de grabar, publicar y comprobar los permisos de acceso del video.
+El recorrido sugerido está en `GUION_VIDEO.md`. El enlace debe reemplazarse después de grabar, publicar y comprobar los permisos de acceso del video.
 
 ## ℹ️ Alcance
 

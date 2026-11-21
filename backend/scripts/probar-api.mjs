@@ -15,8 +15,6 @@ const nombreProducto = `Producto prueba API ${marca}`;
 const nombreProductoCompra = `Producto compra API ${marca}`;
 
 const resultados = [];
-const idsUsuarios = [];
-const idsProductos = [];
 
 function registrarResultado(nombre, correcto, detalle = '') {
     resultados.push({ nombre, correcto, detalle });
@@ -89,8 +87,6 @@ async function ejecutar() {
             })
         })
     );
-    idsProductos.push(productoCrud.producto.id);
-
     await esperarEstado(
         'GET producto por ID',
         200,
@@ -134,7 +130,6 @@ async function ejecutar() {
             })
         })
     );
-    idsUsuarios.push(registro.usuario.id);
     registrarResultado(
         'Registro no expone password',
         !Object.hasOwn(registro.usuario, 'password')
@@ -196,7 +191,6 @@ async function ejecutar() {
             })
         })
     );
-    idsUsuarios.push(registroInactivo.usuario.id);
     await db.collection('usuarios').updateOne(
         { id: registroInactivo.usuario.id },
         { $set: { activo: false } }
@@ -230,8 +224,6 @@ async function ejecutar() {
             })
         })
     );
-    idsProductos.push(productoCompra.producto.id);
-
     const cuerpoCompra = {
         direccion: 'Calle de Prueba 123',
         productos: [{ id_producto: productoCompra.producto.id, cantidad: 1 }]

@@ -1,4 +1,3 @@
-import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import dotenv from 'dotenv';
@@ -7,18 +6,6 @@ const directorioActual = path.dirname(fileURLToPath(import.meta.url));
 export const rutaEnv = path.resolve(directorioActual, '../../.env');
 
 dotenv.config({ path: rutaEnv, quiet: true });
-
-// Mantiene compatibilidad con el archivo .env antiguo, que contenía sólo la URI.
-if (!process.env.MONGODB_URI && fs.existsSync(rutaEnv)) {
-    const contenido = fs.readFileSync(rutaEnv, 'utf8').trim();
-
-    if (
-        !contenido.includes('\n') &&
-        (contenido.startsWith('mongodb://') || contenido.startsWith('mongodb+srv://'))
-    ) {
-        process.env.MONGODB_URI = contenido;
-    }
-}
 
 export function obtenerMongoUri() {
     const uri = process.env.MONGODB_URI?.trim();

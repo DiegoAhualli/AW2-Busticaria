@@ -51,8 +51,6 @@
             // sessionStorage limita el JWT a la pestaña actual.
             sessionStorage.setItem('tokenBusticaria', datos.token);
 
-            localStorage.removeItem('usuarioRegistrado');
-
             window.location.href = '/pages/home.html';
 
         } catch (error) {

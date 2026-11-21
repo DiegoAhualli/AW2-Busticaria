@@ -32,6 +32,15 @@ app.get('/', (req, res) => {
 // El frontend y la API comparten origen; no se requiere configuración CORS.
 app.use(express.static(directorioFrontend));
 
+app.use((error, req, res, _next) => {
+    if (error instanceof SyntaxError && 'body' in error) {
+        return res.status(400).json({ mensaje: 'El cuerpo JSON es inválido' });
+    }
+
+    console.error('Error no controlado:', error.message);
+    return res.status(500).json({ mensaje: 'Error interno del servidor' });
+});
+
 app.use((req, res) => {
     res.status(404).json({ mensaje: 'Ruta no encontrada' });
 });
