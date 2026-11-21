@@ -7,7 +7,7 @@
 - **Institución:** Colegio Universitario IES Siglo 21
 - **Proyecto:** Busticaria
 - **Repositorio:** https://github.com/DiegoAhualli/AW2-Busticaria
-- **Video explicativo:** PENDIENTE DE INCORPORAR
+- **Video explicativo:** https://youtu.be/QZNCGFliHQc
 
 ## Descripción
 
@@ -20,6 +20,15 @@ Busticaria es un ecommerce académico con catálogo, categorías, registro, logi
 - MongoDB Atlas y driver oficial `mongodb`.
 - `bcrypt`, `jsonwebtoken` y `dotenv`.
 - Fetch API, Postman, Git y GitHub.
+
+Las dependencias y sus versiones están declaradas en `backend/package.json` y `backend/package-lock.json`.
+
+## Documentación técnica
+
+- `README.md`: arquitectura, instalación, variables de entorno, MongoDB, Bcrypt, JWT y endpoints.
+- `INFORME_PRUEBAS.md`: resultados reales de migración, seguridad, CRUD y concurrencia.
+- `GUION_VIDEO.md`: recorrido utilizado para la demostración.
+- `postman/Busticaria-Entrega-4.postman_collection.json`: solicitudes importables.
 
 ## Mejoras implementadas
 
@@ -76,9 +85,16 @@ Aplicación: http://localhost:3000
 
 El detalle está en `INFORME_PRUEBAS.md` y la colección importable en `postman/Busticaria-Entrega-4.postman_collection.json`.
 
-## Pendientes manuales
+## Roadmap - Futuras mejoras
 
-1. Grabar y publicar el video.
-2. Comprobar los permisos del enlace.
-3. Reemplazar el marcador pendiente de este archivo y de `README.md`.
-4. Revisar los cambios antes de autorizar commit y push.
+Estas propuestas corresponden a una evolución posterior del proyecto y **no son funcionalidades implementadas en la versión entregada**:
+
+- Recuperación segura de contraseñas mediante enlaces temporales.
+- Roles y permisos para clientes y administradores.
+- Historial de pedidos disponible para cada usuario autenticado.
+- Despliegue web de la aplicación con HTTPS y configuración segura.
+- Integración de pagos de prueba mediante una pasarela en modo sandbox.
+
+## Revisión final
+
+El repositorio, la documentación técnica y el video se encuentran preparados para la entrega. Los cambios deben revisarse antes de autorizar el commit y el push final.

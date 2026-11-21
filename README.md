@@ -126,10 +126,12 @@ cd AW2-Busticaria
 Copiar `.env.example` como `.env` en la **raíz del repositorio**, no dentro de `backend`:
 
 ```dotenv
-MONGODB_URI=mongodb+srv://USUARIO:CONTRASENA@HOST.mongodb.net/busticaria?retryWrites=true&w=majority
-JWT_SECRET=UN_SECRETO_ALEATORIO_DE_AL_MENOS_32_CARACTERES
+MONGODB_URI=
+JWT_SECRET=
 PORT=3000
 ```
+
+Completar `MONGODB_URI` con la URI suministrada por MongoDB Atlas y `JWT_SECRET` con un valor aleatorio de al menos 32 caracteres. Estos valores deben permanecer únicamente en el archivo `.env` local.
 
 Se puede generar un secreto aleatorio localmente con:
 
@@ -303,9 +305,19 @@ La colección contiene variables para la URL base, token e identificadores de pr
 
 ## 🎥 Video explicativo
 
-**Enlace definitivo del video:** PENDIENTE DE INCORPORAR
+**Video de la cuarta entrega:** [Ver en YouTube](https://youtu.be/QZNCGFliHQc)
 
-El recorrido sugerido está en `GUION_VIDEO.md`. El enlace debe reemplazarse después de grabar, publicar y comprobar los permisos de acceso del video.
+El recorrido utilizado para la demostración está documentado en `GUION_VIDEO.md`.
+
+## Roadmap - Futuras mejoras
+
+Las siguientes funcionalidades son propuestas para versiones futuras y **no están implementadas en la entrega actual**:
+
+- **Recuperación de contraseñas:** envío de un enlace temporal y de un solo uso para establecer una nueva contraseña.
+- **Roles y permisos:** diferenciación entre clientes y administradores, con autorización específica para administrar productos, usuarios y ventas.
+- **Historial de pedidos:** sección privada para que cada usuario consulte sus órdenes, productos, importes y estados.
+- **Despliegue web:** publicación del frontend, la API y MongoDB en servicios administrados con HTTPS y variables de entorno seguras.
+- **Pagos de prueba:** integración con el entorno sandbox de una pasarela de pagos, sin realizar cobros reales.
 
 ## ℹ️ Alcance
 
